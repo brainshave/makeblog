@@ -1,0 +1,75 @@
+Fist line = title, second line can be empty (maybe add an option for subtitles?)
+
+attr1: value, simple map
+attr2: another value
+index: if false, don't put in the archives (means this is a page, not a blog post)
+tags: obvious, divided by commas
+
+After another empty line, first paragraph starts. Like everywhere,
+end-of-lines aren't sigficant until ended with two backslashes.\\
+
+Generally, paragraphs are divided by empty lines. Revealing, huh.
+
+* Sections titles are marked by asterisks. (Stealed from org-mode)
+One star means h2 tag because h1 is reserved for article title.
+By the way, section title is one liner, a paragraph begins immediately after.
+(Empty line is optional).
+
+* Lists
+There can be bulleted lists. In the input text each list elem starts with dash.
+- item one
+- item two
+  - subitem of "item two", identation matters.
+    - obvious.
+  # obviously there can be numbered lists.
+  # they start with hash mark.
+
+* Comments
+Lines starting with percentage mark (%) are comments. You won't see this:\\
+% dupa is a beatiful word in my first language.
+
+* Links
+Any word ending with .html pointing to existing file
+or to an html file that has its *.txt source
+or beginning with an http(s):// will treated as a link.
+The word immediately before address will be text of the link.
+If it's ! then link address will be used.
+
+Also, appending ! to the address will make it plain text.
+
+* Images
+All words ending with .png, .jpg, .gif, .bmp (maybe some more) will be
+translated to inlined thumbnail pointing to original image, only if
+they point to existing file or if they're begining with http:// or
+https://. If ! is added like in asdf.png! , original image will be
+inlined.
+
+
+* Font Styles
+- /italic/ between slashes
+- _underlines_ between underscores 
+- *bolds* between asterisks
+- -crosses- between dashes
+- hint: they will only work if there is no space between symbol and a word.
+  - *this works*
+  - * this won't work*
+
+* Positioning
+=> Paragraphs that begins with be right-aligned, right-floated,
+with auto width.
+
+<= Analogical to =>.
+
+-> Paragraphs that begins with -> will be right-aligned.
+
+>< Paragraphs that begins with >< will be centered.
+
+* Code and Qutoes
+To be thought.
+
+Each line of quote should begin with >, like this:
+> Gravity can't be held responsible for people falling in love.
+> -- Albert Einstein
+
+* My Beautiful English
+To be learned.
