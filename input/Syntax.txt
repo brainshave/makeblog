@@ -1,4 +1,4 @@
-Fist line = title, second line can be empty (maybe add an option for subtitles?)
+Fist line = title, second line can be subtitle
 
 attr1: value, simple map
 attr2: another value
