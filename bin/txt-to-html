@@ -4,13 +4,13 @@
 import sys, re
 
 # read file and split into list of paragraphs
-input_text = open(sys.argv[1]).read()
+input_text = open(sys.argv[1]).read().expandtabs(8)
 paragraphs = re.split('\n\s*\n', input_text)
 
 # title is technically first paragraph,
 # so its posible to have multiline titles,
 # or subtitles/abstracts. To be considered.
-title = paragraphs[0]
+title = paragraphs[0].strip()
 
 def find_attributes(text):
     """
@@ -28,4 +28,37 @@ if len(attributes) != 0 :
     body = paragraphs[2:]
 else:
     body = paragraphs[1:] # when first paragraph isn't attribute map
+
+beginings = {r'\*+': parse_header # 1+ stars
+             r'[\t ]*[-#]': parse_list, # any number of tabs or spaces, then - or #
+             r'>[^<]': parse_quote # first >. < can't be after, because its reseved  for centered text
+             r'[^*-#]': parse_rest}
+
+
+################ TRASH:
+
+# find headers: most important is (?:\*+) part. finds one or more asterisks.
+header_find_pattern = re.compile('(?:\A|\n)(?:\*+)[\t ]*[^\n]*')
+# find lists: most important is [-#] part.
+list_find_pattern = re.compile('(?:(?:\A|\n)[\t ]*[-#][^\n]*)+')
+
+# pattern => handling function
+patterns = {header_find_pattern: 0,
+            list_find_pattern: 0}
+
+
+def pattern_nogroups(pattern):
+    """
+    Disable groups in pattern. Changes '(' into '(?:'.
+    """
+    return re.compile(pattern.pattern.replace('(', '(?:'), pattern.flags)
+
+header_pattern = re.compile('^(\*+)\s*(.*)\s*$', re.MULTILINE)
+def header_inserter(match):
+    level = len(match.group(1)) + 1 # one star is h2
+    return '<h%d>%s</h%d>' % (level, match.group(2).strip(), level)
+header_patter_nogroups = header_pattern.pattern.replace('(', '(?:')
+
+list_pattern = re.compile('(^(\s*)[-#]\s*(.*)\s*$)+', re.MULTILINE)
+    
 
