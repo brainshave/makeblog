@@ -36,7 +36,7 @@ else:
     body = paragraphs[1:] # when first paragraph isn't attribute map
 
 
-##### STRUCTURE PARTS PARSERS:
+#### STRUCTURE PARTS PARSERS:
 ## Each structure part is defined by _expr regular expression
 ## and function that parses that part.
 
@@ -94,11 +94,34 @@ def qutoes_fn(match):
     text += "</blockquote>\n"
     return text
 
+
+#### DECORATIONAL PATTERNS:
+## TODO: support all of: http://www.w3schools.com/html5/tag_phrase_elements.asp
+decors = [['/', 'em'],
+          ['_', 'u'],
+	  ['*', 'strong'],
+	  ['-', 'del']]
+	  
+decor_patterns = []
+  
+for symbol, tag in decors:
+    escaped = re.escape(symbol)
+    #pattern = re.compile(r"(?<=\s|>)%s\b([^%s]*)\b%s(?=\s|<)" % (escaped, symbol, escaped))
+    pattern = re.compile(r"(?<!<|\w)%s(?=\S)([^%s]*)(?<=\S)%s(?=\W)" % (escaped, symbol, escaped))
+    bla = tag
+    #fn = lambda match: "<%s>%s</%s>" % (bla, match.group(1), tag)
+    fn = r"<%s>\1</%s>" % (tag, tag)
+    decor_patterns.append([pattern, fn])
+	  
 ## PARSING PATTERNS:
 patterns_fns = [[comments_expr, comments_fn],
                 [header_expr, header_fn],
                 [list_expr, list_fn],
                 [quotes_expr, qutoes_fn]]
+                
+patterns_fns += decor_patterns
+for pattern, _ in patterns_fns:
+    print pattern.pattern
 
 for p in body:
     text = p

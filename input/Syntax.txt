@@ -52,6 +52,8 @@ inlined.
 - _underlines_ between underscores 
 - *bolds* between asterisks
 - -crosses- between dashes
+- first, *bolded, then /emphasised/*
+- /*-asdf-*/ -*/qwer/*-
 - hint: they will only work if there is no space between symbol and a word.
   - *this works*
   - * this won't work*
@@ -62,7 +64,7 @@ with auto width.
 
 <= Analogical to =>.
 
--> Paragraphs that begins with -> will be right-aligned.
+-> Paragraphs that begins with -> will be right-aligned. -> adsf ->
 
 >< Paragraphs that begins with >< will be centered.
 
