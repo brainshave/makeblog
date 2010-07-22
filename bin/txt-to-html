@@ -131,7 +131,7 @@ for p in body:
     print text
     
 # uncomment to see how patterns look like                
-for pattern, _ in patterns_fns:
-    print >> sys.stderr, pattern.pattern
+#for pattern, _ in patterns_fns:
+#    print >> sys.stderr, pattern.pattern
     
 
