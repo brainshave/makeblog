@@ -39,7 +39,7 @@ If it's ! then link address will be used.
 
 Also, appending ! to the address will make it plain text.
 
-* Images
+*** Images
 All words ending with .png, .jpg, .gif, .bmp (maybe some more) will be
 translated to inlined thumbnail pointing to original image, only if
 they point to existing file or if they're begining with http:// or
