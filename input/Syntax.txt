@@ -7,7 +7,6 @@ tags: obvious, divided by commas
 
 After another empty line, first paragraph starts. Like everywhere,
 end-of-lines aren't sigficant until ended with two backslashes.\\
-
 Generally, paragraphs are divided by empty lines. Revealing, huh.
 
 * Sections titles are marked by asterisks. (Stealed from org-mode)
@@ -18,6 +17,9 @@ By the way, section title is one liner, a paragraph begins immediately after.
 * Lists
 There can be bulleted lists. In the input text each list elem starts with dash.
 - item one
+  # asdf
+    - uiop
+  # qwer
 - item two
   - subitem of "item two", identation matters.
     - obvious.
@@ -25,7 +27,7 @@ There can be bulleted lists. In the input text each list elem starts with dash.
   # they start with hash mark.
 
 * Comments
-Lines starting with percentage mark (%) are comments. You won't see this:\\
+Lines starting with percentage mark (%) are comments. You won't see this:
 % dupa is a beatiful word in my first language.
 
 * Links

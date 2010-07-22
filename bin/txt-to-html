@@ -29,36 +29,121 @@ if len(attributes) != 0 :
 else:
     body = paragraphs[1:] # when first paragraph isn't attribute map
 
-beginings = {r'\*+': parse_header # 1+ stars
-             r'[\t ]*[-#]': parse_list, # any number of tabs or spaces, then - or #
-             r'>[^<]': parse_quote # first >. < can't be after, because its reseved  for centered text
-             r'[^*-#]': parse_rest}
 
+comments_expr = re.compile(r'^%[^\n]*$', re.MULTILINE)
+
+#paragraph_expr = re.compile(r'(?:\n|\A).*(?=(?:\n\*)|(
+
+header_expr = re.compile(r'^(\*+)[\t ]*([^\n]*)[\t ]*$', re.MULTILINE)
+
+def header_fn(match):
+    level = len(match.group(1)) + 1 # one star is h2
+    return '<h%d>%s</h%d>' % (level, match.group(2).strip(), level)
+
+list_expr = re.compile(r'((?:\n|\A)[\t ]*[-#](?!>)[\t ]*[^\n]*)+')
+#re.compile(r'(?:(?:\n|\A)([\t ]*)([-#])(?!>)[\t ]*([^\n]*))+')
+list_item_expr = re.compile(r'^(?P<depth>[\t ]*)(?P<symbol>[-#])(?P<text>.*)$')
+def list_fn(match):
+    tag_stack = [] # stack of tuples: [ tag, depth_indent ]
+    text = ""
+    for line in match.group(0).splitlines():
+        m = list_item_expr.match(line)
+        if m:
+            depth = len(m.group("depth"))
+            tag = {'-': 'ul', '#': 'ol'}[m.group("symbol")]
+            content = m.group("text").strip()
+            if len(tag_stack) == 0 or depth > tag_stack[-1][1]:
+            	tag_stack.append([tag, depth])
+            	text += "<%s>\n" % tag            	
+            while depth < tag_stack[-1][1]:
+            	old_tag, _ = tag_stack.pop()
+            	text += "</%s>\n" % old_tag
+            	
+            if tag_stack[-1][0] != tag and tag_stack[1][1] == depth:
+            	old_tag, _ = tag_stack.pop()
+            	tag_stack.append([tag, depth])
+            	text += "</%s>\n<%s>\n" % (old_tag, tag)
+            
+	    text += "<li>%s</li>\n" % content
+    tag_stack.reverse()
+    for tag, _ in tag_stack:
+    	text += "</%s>" % tag
+    return text
+        
+        
+
+quotes_expr = re.compile(r'((?:\n|\A)>[^<]([^\n])*)+')
+def qutoes_fn(match):
+    return "\nQUOTE" + str(match.groups()) + "QUOTE\n"
+
+patterns_fns = [[comments_expr, ""],
+                [header_expr, header_fn],
+                [list_expr, list_fn],
+                [quotes_expr, qutoes_fn]]
+
+
+for p in body:
+    text = p
+    for expr, fn in patterns_fns:
+        text = expr.sub(fn,text)
+    print text
+
+
+### trash
+
+# separator =  re.compile(r"""
+# (?<! [\t\ ] * [-#] [^\n]* )
+# \n
+# (?=  [\t\ ] * [-#] [^\n]* )
+# """, re.VERBOSE)
+
+# separator__ = re.compile(r"""
+# (?: \A | \n ) # start of string or a new line followed by one of:
+# (?: (?=   (?: \* + [^\n] *)               # beginning of header
+#         | (?: [\n\t\ ] * [-#] [^\n] *)+  # list structure
+#         | (?: >[^<] [^\n] * \n)+          # quotes
+#     )
+#   )
+# """, re.VERBOSE)
+
+# separator2 = re.compile(r"""
+# (?=   (?: ^ \* + [^\n] * $ )            # header
+#     | (?: ^ [\t\ ] * [-#] [^\n] * $ )+  # list structure
+#     | (?: ^ >[^<] [^\n] * $ )+          # quotes
+# )
+# """, re.VERBOSE | re.MULTILINE)
 
 ################ TRASH:
 
-# find headers: most important is (?:\*+) part. finds one or more asterisks.
-header_find_pattern = re.compile('(?:\A|\n)(?:\*+)[\t ]*[^\n]*')
-# find lists: most important is [-#] part.
-list_find_pattern = re.compile('(?:(?:\A|\n)[\t ]*[-#][^\n]*)+')
 
-# pattern => handling function
-patterns = {header_find_pattern: 0,
-            list_find_pattern: 0}
+# beginings = {r'\*+': parse_header, # 1+ stars
+#              r'[\t ]*[-#]': parse_list, # any number of tabs or spaces, then - or #
+#              r'>[^<]': parse_quote, # first >. < can't be after, because its reseved  for centered text
+#              r'[^*-#]': parse_rest}
 
 
-def pattern_nogroups(pattern):
-    """
-    Disable groups in pattern. Changes '(' into '(?:'.
-    """
-    return re.compile(pattern.pattern.replace('(', '(?:'), pattern.flags)
+# # find headers: most important is (?:\*+) part. finds one or more asterisks.
+# header_find_pattern = re.compile('(?:\A|\n)(?:\*+)[\t ]*[^\n]*')
+# # find lists: most important is [-#] part.
+# list_find_pattern = re.compile('(?:(?:\A|\n)[\t ]*[-#][^\n]*)+')
 
-header_pattern = re.compile('^(\*+)\s*(.*)\s*$', re.MULTILINE)
-def header_inserter(match):
-    level = len(match.group(1)) + 1 # one star is h2
-    return '<h%d>%s</h%d>' % (level, match.group(2).strip(), level)
-header_patter_nogroups = header_pattern.pattern.replace('(', '(?:')
+# # pattern => handling function
+# patterns = {header_find_pattern: 0,
+#             list_find_pattern: 0}
 
-list_pattern = re.compile('(^(\s*)[-#]\s*(.*)\s*$)+', re.MULTILINE)
+
+# def pattern_nogroups(pattern):
+#     """
+#     Disable groups in pattern. Changes '(' into '(?:'.
+#     """
+#     return re.compile(pattern.pattern.replace('(', '(?:'), pattern.flags)
+
+# header_pattern = re.compile('^(\*+)\s*(.*)\s*$', re.MULTILINE)
+# def header_inserter(match):
+#     level = len(match.group(1)) + 1 # one star is h2
+#     return '<h%d>%s</h%d>' % (level, match.group(2).strip(), level)
+# header_patter_nogroups = header_pattern.pattern.replace('(', '(?:')
+
+# list_pattern = re.compile('(^(\s*)[-#]\s*(.*)\s*$)+', re.MULTILINE)
     
 
