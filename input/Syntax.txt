@@ -52,6 +52,7 @@ inlined.
 - _underlines_ between underscores 
 - *bolds* between asterisks
 - -crosses- between dashes
+- @code()@ between monkeys: @
 - first, *bolded, then /emphasised/*
 - /*-asdf-*/ -*/qwer/*-
 - hint: they will only work if there is no space between symbol and a word.

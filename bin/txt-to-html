@@ -100,7 +100,8 @@ def qutoes_fn(match):
 decors = [['/', 'em'],
           ['_', 'u'],
 	  ['*', 'strong'],
-	  ['-', 'del']]
+	  ['-', 'del'],
+	  ['@', 'code']]
 	  
 decor_patterns = []
   
@@ -118,10 +119,11 @@ patterns_fns = [[comments_expr, comments_fn],
                 [header_expr, header_fn],
                 [list_expr, list_fn],
                 [quotes_expr, qutoes_fn]]
-                
+
+# uncomment to see how patterns look like                
 patterns_fns += decor_patterns
 for pattern, _ in patterns_fns:
-    print pattern.pattern
+    print >> sys.stderr, pattern.pattern
 
 for p in body:
     text = p
