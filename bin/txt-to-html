@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # AUTHOR:  Szymon Witamborski, santamon@gmail.com
 # PROJECT: Makeblog, http://launchpad.net/makeblog
-# LICENCE: BSD, included in file LICENCE
+# LICENCE: MIT, included in file LICENCE
 #
 # This part:
 # TXT to HTML converter with nice org-mode-like syntax
@@ -114,20 +114,24 @@ for symbol, tag in decors:
     fn = r"<%s>\1</%s>" % (tag, tag)
     decor_patterns.append([pattern, fn])
 	  
-## PARSING PATTERNS:
+## Merging patterns:
 patterns_fns = [[comments_expr, comments_fn],
                 [header_expr, header_fn],
                 [list_expr, list_fn],
                 [quotes_expr, qutoes_fn]]
-
-# uncomment to see how patterns look like                
+                
 patterns_fns += decor_patterns
-for pattern, _ in patterns_fns:
-    print >> sys.stderr, pattern.pattern
+
+#### PROCESS ALL PATTERNS IN ORDER:
 
 for p in body:
     text = p
     for expr, fn in patterns_fns:
         text = expr.sub(fn,text)
     print text
+    
+# uncomment to see how patterns look like                
+for pattern, _ in patterns_fns:
+    print >> sys.stderr, pattern.pattern
+    
 
