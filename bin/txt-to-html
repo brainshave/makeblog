@@ -9,6 +9,9 @@
 
 import sys, re
 
+# read page template:
+template = open("templates/article.html").read()
+
 # read file and split into list of paragraphs
 input_text = open(sys.argv[1]).read().expandtabs(8)
 paragraphs = re.split('\n\s*\n', input_text)
@@ -124,11 +127,14 @@ patterns_fns += decor_patterns
 
 #### PROCESS ALL PATTERNS IN ORDER:
 
+body_text = ""
 for p in body:
     text = p
     for expr, fn in patterns_fns:
         text = expr.sub(fn,text)
-    print text
+    body_text += text
+    
+print template % {'title': title, 'body': body_text}
     
 # uncomment to see how patterns look like                
 #for pattern, _ in patterns_fns:

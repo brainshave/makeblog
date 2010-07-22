@@ -10,5 +10,7 @@
 HTML_TARGETS := $(patsubst input/%.txt,output/%.html,$(wildcard input/*.txt))
 ALL_TARGETS := $(ALL_TARGETS) $(HTML_TARGETS)
 
+$(HTML_TARGETS) : templates/article.html
+
 output/%.html : input/%.txt
 	bin/txt-to-html $< > $@
