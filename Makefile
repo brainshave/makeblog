@@ -11,6 +11,7 @@ blog: blog_main
 ALL_TARGETS := 
 INDIR := input
 OUTDIR := output
+TMPDIR := tmp
 
 -include config
 
@@ -18,10 +19,11 @@ OUTDIR := output
 -include */*.mk
 -include */Makefile
 
-blog_main: $(OUTDIR) $(ALL_TARGETS)
+blog_main: $(TMPDIR) $(OUTDIR) $(ALL_TARGETS)
 
-$(OUTDIR): 
-	mkdir -p $(OUTDIR)
+$(OUTDIR) $(TMPDIR): 
+	mkdir -p $@
 
 clean:
 	rm -rf $(ALL_TARGETS)
+	rm -rf $(TMPDIR)

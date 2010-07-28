@@ -7,13 +7,31 @@
 # This part:
 # TXT to HTML converter with nice org-mode-like syntax
 
-import sys, re
+import sys, re, getopt, os
+from datetime import datetime
+
+def print_help():
+    print """TXT to HTML converter, uses org-mode-like syntax.
+  
+  Options:
+    -t path     - use alternative template (default: article.html)
+    -i path     - input file
+    -o path     - output file
+    -c path     - cache file (attributes will go there)
+"""
+    exit(1)
+
+opts, _ = getopt.gnu_getopt(sys.argv[1:], 't:i:o:c:h')
+options = dict(opts)
+
+if '-h' in options.keys():
+    print_help()
 
 # read page template:
-template = open("txt-to-html/article.html").read()
+template = open(options.get('-t', "txt-to-html/article.html")).read()
 
 # read file and split into list of paragraphs
-input_text = open(sys.argv[1]).read().expandtabs(8)
+input_text = open(options['-i']).read().expandtabs(8)
 paragraphs = re.split('\n\s*\n', input_text)
 
 # title is technically first paragraph,
@@ -38,6 +56,13 @@ if len(attributes) != 0 :
 else:
     body = paragraphs[1:] # when first paragraph isn't attribute map
 
+attributes['title'] = title
+if not 'date' in attributes:
+    attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
+
+## Dump attributes to stderr:
+if attributes.get('index', 'true') != 'false' and options.get('-c'):
+    open(options['-c'], 'w').write(str(attributes))
 
 #### STRUCTURE PARTS PARSERS:
 ## Each structure part is defined by _expr regular expression
@@ -134,7 +159,7 @@ for p in body:
         text = expr.sub(fn,text)
     body_text += text
     
-print template % {'title': title, 'body': body_text}
+open(options['-o'], 'w').write(template % {'title': title, 'body': body_text})
     
 # uncomment to see how patterns look like                
 #for pattern, _ in patterns_fns:

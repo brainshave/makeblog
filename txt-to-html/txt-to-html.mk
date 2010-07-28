@@ -13,4 +13,4 @@ ALL_TARGETS := $(ALL_TARGETS) $(HTML_TARGETS)
 $(HTML_TARGETS) : txt-to-html/article.html
 
 $(OUTDIR)/%.html : $(INDIR)/%.txt
-	python txt-to-html/txt-to-html.py $< > $@
+	python txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(OUTDIR)/%,$(TMPDIR)/%.cache,$@)
