@@ -8,10 +8,10 @@
 blog: blog_main
 
 # Append to this variable to compile your targets in blog:
-ALL_TARGETS := 
-INDIR := input
-OUTDIR := output
-TMPDIR := tmp
+ALL_TARGETS = 
+INDIR = input
+OUTDIR = output
+TMPDIR = tmp
 
 -include config
 
