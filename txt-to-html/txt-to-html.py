@@ -10,7 +10,7 @@
 import sys, re
 
 # read page template:
-template = open("templates/article.html").read()
+template = open("txt-to-html/article.html").read()
 
 # read file and split into list of paragraphs
 input_text = open(sys.argv[1]).read().expandtabs(8)

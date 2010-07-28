@@ -7,10 +7,10 @@
 
 # Tricky path substitution to generate output/*.html targets from
 # input/*.txt sources.
-HTML_TARGETS := $(patsubst input/%.txt,output/%.html,$(wildcard input/*.txt))
+HTML_TARGETS := $(patsubst $(INDIR)/%.txt,$(OUTDIR)/%.html,$(wildcard $(INDIR)/*.txt))
 ALL_TARGETS := $(ALL_TARGETS) $(HTML_TARGETS)
 
-$(HTML_TARGETS) : templates/article.html
+$(HTML_TARGETS) : txt-to-html/article.html
 
-output/%.html : input/%.txt
-	bin/txt-to-html $< > $@
+$(OUTDIR)/%.html : $(INDIR)/%.txt
+	python txt-to-html/txt-to-html.py $< > $@

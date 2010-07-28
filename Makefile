@@ -9,13 +9,19 @@ blog: blog_main
 
 # Append to this variable to compile your targets in blog:
 ALL_TARGETS := 
+INDIR := input
+OUTDIR := output
+
+-include config
 
 # Include rules from all makefiles in "makefiles" dir:
-include makefiles/*.mk
+-include */*.mk
+-include */Makefile
 
-blog_main: output $(ALL_TARGETS)
+blog_main: $(OUTDIR) $(ALL_TARGETS)
 
-output: 
-	mkdir output
+$(OUTDIR): 
+	mkdir -p $(OUTDIR)
+
 clean:
 	rm -rf $(ALL_TARGETS)
