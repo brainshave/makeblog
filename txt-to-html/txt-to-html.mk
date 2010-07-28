@@ -9,8 +9,11 @@
 # input/*.txt sources.
 HTML_TARGETS := $(patsubst $(INDIR)/%.txt,$(OUTDIR)/%.html,$(wildcard $(INDIR)/*.txt))
 ALL_TARGETS := $(ALL_TARGETS) $(HTML_TARGETS)
+INDEXED_TARGETS := $(INDEXED_TARGETS) $(patsubst $(OUTDIR)/%,$(TMPDIR)/%.cache,$(HTML_TARGETS))
 
 $(HTML_TARGETS) : txt-to-html/article.html
+
+$(TMPDIR)/%.html.cache : $(OUTDIR)/%.html
 
 $(OUTDIR)/%.html : $(INDIR)/%.txt
 	python txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(OUTDIR)/%,$(TMPDIR)/%.cache,$@)

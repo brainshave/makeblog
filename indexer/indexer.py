@@ -7,5 +7,6 @@
 # This part:
 # General indexer
 
+import sys, os
 
-
+print sys.argv
