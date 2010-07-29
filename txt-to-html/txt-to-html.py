@@ -57,6 +57,8 @@ else:
     body = paragraphs[1:] # when first paragraph isn't attribute map
 
 attributes['title'] = title
+attributes['input'] = options['-i']
+attributes['output'] = options['-o']
 if not 'date' in attributes:
     attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
 

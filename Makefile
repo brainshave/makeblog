@@ -19,11 +19,39 @@ TMPDIR = tmp
 -include */*.mk
 -include */Makefile
 
-blog_main: $(TMPDIR) $(OUTDIR) $(ALL_TARGETS)
+
+# INDEXED_TARGETS += 
+
+# ALL_TARGETS += $(OUTDIR)/archive.html
+
+
+
+# $(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS)
+# 	python indexer/indexer.py $(INDEXED_TARGETS) -o $@
+
+
+
+# HTML_TARGETS += $(patsubst $(INDIR)/%.txt,$(OUTDIR)/%.html,$(wildcard $(INDIR)/*.txt))
+# ALL_TARGETS += $(HTML_TARGETS)
+
+# INDEXED_TARGETS += $(patsubst $(OUTDIR)/%.html,$(TMPDIR)/%.html-cache,$(HTML_TARGETS))
+
+# $(HTML_TARGETS) : txt-to-html/article.html
+
+
+# $(INDEXED_TARGETS) : $(TMPDIR)
+
+# $(TMPDIR)/%.html-cache : $(OUTDIR)/%.html
+# 	@echo DUPA
+
+# $(OUTDIR)/%.html : $(INDIR)/%.txt
+# 	python txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(OUTDIR)/%,$(TMPDIR)/%-cache,$@)
+
+
+blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS)
 
 $(OUTDIR) $(TMPDIR): 
 	mkdir -p $@
 
 clean:
-	rm -rf $(ALL_TARGETS)
-	rm -rf $(TMPDIR)
+	rm -rf $(OUTDIR)/* $(TMPDIR)
