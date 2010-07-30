@@ -25,4 +25,4 @@ first_date = metadata[1]['date']
 curr_year = first_date.year
 curr_month = first_date.month
 for item in metadata:
-    print d['date']
+    print item['date']

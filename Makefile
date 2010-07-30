@@ -9,6 +9,10 @@ blog: blog_main
 
 # Append to this variable to compile your targets in blog:
 ALL_TARGETS = 
+
+# Append files with python dict to include this in archive:
+INDEXED_TARGETS += 
+
 INDIR = input
 OUTDIR = output
 TMPDIR = tmp
@@ -19,35 +23,15 @@ TMPDIR = tmp
 -include */*.mk
 -include */Makefile
 
+#### Indexer part
+ALL_TARGETS += $(OUTDIR)/archive.html
 
-# INDEXED_TARGETS += 
+$(INDEXED_TARGETS) : $(TMPDIR)
 
-# ALL_TARGETS += $(OUTDIR)/archive.html
+$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS)
+	python indexer/indexer.py $(INDEXED_TARGETS) -o $@
 
-
-
-# $(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS)
-# 	python indexer/indexer.py $(INDEXED_TARGETS) -o $@
-
-
-
-# HTML_TARGETS += $(patsubst $(INDIR)/%.txt,$(OUTDIR)/%.html,$(wildcard $(INDIR)/*.txt))
-# ALL_TARGETS += $(HTML_TARGETS)
-
-# INDEXED_TARGETS += $(patsubst $(OUTDIR)/%.html,$(TMPDIR)/%.html-cache,$(HTML_TARGETS))
-
-# $(HTML_TARGETS) : txt-to-html/article.html
-
-
-# $(INDEXED_TARGETS) : $(TMPDIR)
-
-# $(TMPDIR)/%.html-cache : $(OUTDIR)/%.html
-# 	@echo DUPA
-
-# $(OUTDIR)/%.html : $(INDIR)/%.txt
-# 	python txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(OUTDIR)/%,$(TMPDIR)/%-cache,$@)
-
-
+### Main part
 blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS)
 
 $(OUTDIR) $(TMPDIR): 
