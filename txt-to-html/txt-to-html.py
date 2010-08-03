@@ -28,7 +28,7 @@ if '-h' in options.keys():
     print_help()
 
 # read page template:
-template = open(options.get('-t', "txt-to-html/article.html")).read()
+template = open(options.get('-t', "templates/article.html")).read()
 
 # read file and split into list of paragraphs
 input_text = open(options['-i']).read().expandtabs(8)
@@ -50,7 +50,11 @@ def find_attributes(text):
         attributes[attr[0].strip()] = re.split('\s*,\s*', attr[1])
     return attributes
 
-attributes = find_attributes(paragraphs[1])
+if len(paragraphs) > 1:
+    attributes = find_attributes(paragraphs[1])
+else:
+    attributes = {}
+
 if len(attributes) != 0 :
     body = paragraphs[2:]
 else:

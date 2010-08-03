@@ -23,13 +23,15 @@ TMPDIR = tmp
 -include */*.mk
 -include */Makefile
 
-#### Indexer part
+#### Indexer part, should be executed as last one
 ALL_TARGETS += $(OUTDIR)/archive.html
 
 $(INDEXED_TARGETS) : $(TMPDIR)
 
-$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS)
-	python indexer/indexer.py $(INDEXED_TARGETS) -o $@
+ARCHIVE_TEMPLATE = templates/article.html
+
+$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE)
+	python indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE)
 
 ### Main part
 blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS)
