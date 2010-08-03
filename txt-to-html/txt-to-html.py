@@ -64,8 +64,12 @@ else:
 attributes['title'] = title
 attributes['input'] = options['-i']
 attributes['output'] = options['-o']
-if not 'date' in attributes:
+
+if 'date' in attributes:
+    attributes['date'] = datetime.strptime(attributes['date'][0], '%Y-%m-%d')
+else:
     attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
+    
 
 ## Dump attributes to stderr:
 if attributes.get('index', 'true') != 'false' and options.get('-c'):
