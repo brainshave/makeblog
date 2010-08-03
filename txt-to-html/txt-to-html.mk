@@ -12,7 +12,7 @@ ALL_TARGETS += $(HTML_TARGETS)
 
 INDEXED_TARGETS += $(patsubst $(OUTDIR)/%.html,$(TMPDIR)/%.html-cache,$(HTML_TARGETS))
 
-$(HTML_TARGETS) : templates/article.html
+$(HTML_TARGETS) : $(TEMPLATES_DIR)/article.html txt-to-html/txt-to-html.py txt-to-html/txt-to-html.mk 
 
 $(TMPDIR)/%.html-cache : $(OUTDIR)/%.html
 

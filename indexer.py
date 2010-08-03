@@ -9,6 +9,7 @@
 # rest of arguments are filenames
 
 import sys, os, getopt, datetime, locale, re
+from string import Template
 
 def print_help():
     print """Cache file indexer.
@@ -39,7 +40,7 @@ options = dict(opts)
 
 output_file = options['-o']
 
-template = open(options.get('-t', "templates/article.html")).read()
+template = Template(open(options.get('-t', "templates/article.html")).read())
 
 # print output_file
 outdir = re.compile(r'(.*\/+)[^/]*').match(output_file).group(0)
@@ -52,7 +53,7 @@ metadata.sort(key = lambda x: x['date'], reverse = True)
 
 curr_month = metadata[0]['date']
 
-body = curr_month.strftime(header_format + '<ul>\n')
+body = curr_month.strftime(header_format + '<ul class="archive_list">\n')
 
 outdir = re.compile(r'(.*\/+)[^/]*').match(output_file).group(1)
 ### print outdir
@@ -63,7 +64,7 @@ for item in metadata:
     if curr_month.year != curr_day.year \
             or curr_month.month != curr_day.month:
         curr_month = curr_day
-        body += curr_month.strftime('</ul>%s<ul>\n' % header_format)
+        body += curr_month.strftime('</ul>%s<ul class="archive_list">\n' % header_format)
 
     body += '<li><span class="archive_day">%(day)i</span> ' \
         '<a class="archive_link" href="%(link)s">%(title)s</a></li>\n' % \
@@ -75,5 +76,7 @@ for item in metadata:
 #item['date'].strftime('%d')
 
 body += '</ul>'
-
-open(options['-o'], 'w').write(template % {'title': 'Archive', 'body': body})
+substitutions = {'title': os.environ['BLOG_ARCHIVE_TITLE'],
+                 'body': body,
+                 'blog_title': os.environ['BLOG_TITLE']}
+open(options['-o'], 'w').write(template.safe_substitute(substitutions))

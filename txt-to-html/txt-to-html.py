@@ -9,6 +9,7 @@
 
 import sys, re, getopt, os
 from datetime import datetime
+from string import Template
 
 def print_help():
     print """TXT to HTML converter, uses org-mode-like syntax.
@@ -28,7 +29,7 @@ if '-h' in options.keys():
     print_help()
 
 # read page template:
-template = open(options.get('-t', "templates/article.html")).read()
+template = Template(open(options.get('-t', "templates/article.html")).read())
 
 # read file and split into list of paragraphs
 input_text = open(options['-i']).read().expandtabs(8)
@@ -165,7 +166,11 @@ for p in body:
         text = expr.sub(fn,text)
     body_text += text
     
-open(options['-o'], 'w').write(template % {'title': title, 'body': body_text})
+substitutions = {'title': title,
+                 'body': body_text,
+                 'blog_title': os.environ['BLOG_TITLE']}
+
+open(options['-o'], 'w').write(template.safe_substitute(substitutions))
     
 # uncomment to see how patterns look like                
 #for pattern, _ in patterns_fns:
