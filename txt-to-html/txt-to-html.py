@@ -90,7 +90,7 @@ header_expr = re.compile(r'^(\*+)[\t ]*([^\n]*)[\t ]*$', re.MULTILINE)
 def header_fn(match):
     # count the stars in first group:
     level = len(match.group(1)) + 1 # one star is h2
-    return '<h%d>%s</h%d>' % (level, match.group(2).strip(), level)
+    return '\n<h%d>%s</h%d>\n' % (level, match.group(2).strip(), level)
 
 
 # LISTS. expression to distinct listings from others:
@@ -136,13 +136,15 @@ def qutoes_fn(match):
 
 #### Links
 
-links_exprs = [ 
-#    re.compile(r'(?<=\s)(?P<boundary>[^\w\s\d])
-    re.compile(r'(?P<boundary>[^\s\w\d])(?P<label>[\s\w\d]+)(?P=boundary)\s+(?P<url>https?:\/\/[^\s<]+)'),
-    re.compile(r'(?P<label>\!|\[[^\]]+\]|[^\s>]+)\s+(?P<url>https?:\/\/[^\s<]+)')]
+url_part = r'(?P<url>\w+\.html\!?|https?:\/\/[^\s<]+)'
+links_exprs = [
+    re.compile(r'(?P<boundary>[^\s\w\d])(?P<label>[\s\w\d]+)(?P=boundary)\s+' + url_part),
+    re.compile(r'(?P<label>\!|\[[^\]]+\]|[^\s>]+)\s+' + url_part)]
 
 def links_fn(match):
     groups = match.groupdict()
+    if groups['url'][-1] == '!':
+        return match.group(0)[0:-1]
     if not 'boundary' in groups.keys():
         groups['boundary'] = ""
     groups['label'] = re.sub(r'\A\[([^\]]*)\]\Z', r'\1', groups['label'])
@@ -152,8 +154,8 @@ def links_fn(match):
 
 links_patterns = map(lambda x: [x, links_fn], links_exprs)
 
-#### Images
-## TODO
+#### File handlers
+file_patterns = []
 
 
 #### DECORATIONAL PATTERNS:
@@ -181,7 +183,7 @@ patterns_fns = [[comments_expr, comments_fn],
                 [list_expr, list_fn],
                 [quotes_expr, qutoes_fn]]
                 
-patterns_fns += links_patterns + decor_patterns
+patterns_fns += links_patterns + file_patterns + decor_patterns
 
 #### PROCESS ALL PATTERNS IN ORDER:
 

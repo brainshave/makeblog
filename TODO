@@ -4,3 +4,4 @@ TODO
 - -links-
 - paragaphs
 - \\ -> <br />
+- forbid parsing decors in links

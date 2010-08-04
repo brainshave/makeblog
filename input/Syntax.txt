@@ -16,7 +16,8 @@ By the way, section title is one liner, a paragraph begins immediately after.
 (Empty line is optional).
 
 * Lists
-There can be bulleted lists. In the input text each list elem starts with dash.
+There can be bulleted lists. In the input text each list elem starts
+ with dash.
 - item one
   # asdf
     - uiop
@@ -42,10 +43,12 @@ Tests:
 - ! http://pstryk.net/~santamon sdfs  sadf
 - /UIOP/ http://ps-tr@yk.net/~sant@amon sdfwefw
 - ASDF Syntax.html wefwe
+- [qwer uiop] Syntax.html
+- @tyuio ghjk tyui@ archive.html
 - sd fas Syntax.html! wefwe
 - [tyu erty erty wert] http://pstryk.net/asdf/asdf/asdf/ wefwe
-- QWER http://pstryk.net/~santamon wfewe we
-- @asdf asdfas@ http://google.com/bsd
+- QWER http://pstryk.net/~santamon! wfewe we
+- /asdf asdfas/ http://google.com/bsd/a/a_a_a
 
 Also, appending ! to the address will make it plain text.
 
