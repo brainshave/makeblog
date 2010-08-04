@@ -134,6 +134,28 @@ def qutoes_fn(match):
     return text
 
 
+#### Links
+
+links_exprs = [ 
+#    re.compile(r'(?<=\s)(?P<boundary>[^\w\s\d])
+    re.compile(r'(?P<boundary>[^\s\w\d])(?P<label>[\s\w\d]+)(?P=boundary)\s+(?P<url>https?:\/\/[^\s<]+)'),
+    re.compile(r'(?P<label>\!|\[[^\]]+\]|[^\s>]+)\s+(?P<url>https?:\/\/[^\s<]+)')]
+
+def links_fn(match):
+    groups = match.groupdict()
+    if not 'boundary' in groups.keys():
+        groups['boundary'] = ""
+    groups['label'] = re.sub(r'\A\[([^\]]*)\]\Z', r'\1', groups['label'])
+    if groups['label'] == '!':
+        groups['label'] = groups['url']
+    return '<a href="%(url)s">%(boundary)s%(label)s%(boundary)s</a>' % groups
+
+links_patterns = map(lambda x: [x, links_fn], links_exprs)
+
+#### Images
+## TODO
+
+
 #### DECORATIONAL PATTERNS:
 ## TODO: support all of: http://www.w3schools.com/html5/tag_phrase_elements.asp
 decors = [['/', 'em'],
@@ -146,20 +168,20 @@ decor_patterns = []
   
 for symbol, tag in decors:
     escaped = re.escape(symbol)
-    #pattern = re.compile(r"(?<=\s|>)%s\b([^%s]*)\b%s(?=\s|<)" % (escaped, symbol, escaped))
-    pattern = re.compile(r"(?<!<|\w)%s(?=\S)([^%s]*)(?<=\S)%s(?=\W)" % (escaped, symbol, escaped))
-    bla = tag
+    #pattern = re.compile(r"(?<=\s|>)%s\b([^%s]+)\b%s(?=\s|<)" % (escaped, symbol, escaped))
+    pattern = re.compile(r"(?<!<|\w|[%(symbol)s])%(escaped)s(?=\S)([^%(symbol)s]+)(?<=\S)%(escaped)s(?=\W)" % {'symbol': symbol, 'escaped': escaped})
     #fn = lambda match: "<%s>%s</%s>" % (bla, match.group(1), tag)
     fn = r"<%s>\1</%s>" % (tag, tag)
     decor_patterns.append([pattern, fn])
 	  
+
 #### Merging patterns:
 patterns_fns = [[comments_expr, comments_fn],
                 [header_expr, header_fn],
                 [list_expr, list_fn],
                 [quotes_expr, qutoes_fn]]
                 
-patterns_fns += decor_patterns
+patterns_fns += links_patterns + decor_patterns
 
 #### PROCESS ALL PATTERNS IN ORDER:
 

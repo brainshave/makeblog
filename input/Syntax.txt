@@ -38,13 +38,22 @@ or beginning with an http(s):// will treated as a link.
 The word immediately before address will be text of the link.
 If it's ! then link address will be used.
 
+Tests:
+- ! http://pstryk.net/~santamon sdfs  sadf
+- /UIOP/ http://ps-tr@yk.net/~sant@amon sdfwefw
+- ASDF Syntax.html wefwe
+- sd fas Syntax.html! wefwe
+- [tyu erty erty wert] http://pstryk.net/asdf/asdf/asdf/ wefwe
+- QWER http://pstryk.net/~santamon wfewe we
+- @asdf asdfas@ http://google.com/bsd
+
 Also, appending ! to the address will make it plain text.
 
 *** Images
 All words ending with .png, .jpg, .gif, .bmp (maybe some more) will be
 translated to inlined thumbnail pointing to original image, only if
-they point to existing file or if they're begining with http:// or
-https://. If ! is added like in asdf.png! , original image will be
+they point to existing file or if they're begining with @http://@ or
+@https://@. If ! is added like in asdf.png! , original image will be
 inlined.
 
 
