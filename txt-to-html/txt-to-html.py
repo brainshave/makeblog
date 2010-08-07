@@ -89,7 +89,16 @@ paragraph_expr =  re.compile(r'(?:(?:\n|\A)(?![\t ]*[-#*>]\**\s)[^\n]*)+')
 #paragraph_fn = r'\n<p>\1\n</p>\n'
 def paragraph_fn(match):
     text = match.group(0).strip()
-    return '\n<p>%(text)s</p>\n' % {'text': text}
+    classes = [['=>', 'makeblog_box makeblog_box_right'],
+               ['<=', 'makeblog_box makeblog_box_left'],
+               ['->', 'makeblog_right'],
+               ['|', 'makeblog_center']]
+    class_code = ''
+    for prefix, class_name in classes:
+        if text.startswith(prefix):
+            class_code = ' class="%s"' % class_name
+            text = text[len(prefix):].strip()
+    return '\n<p%(class)s>%(text)s</p>\n' % {'text': text, 'class': class_code}
 
 header_expr = re.compile(r'^(\*+)[\t ]+([^\n]*)[\t ]*$', re.MULTILINE)
 

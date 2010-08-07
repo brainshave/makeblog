@@ -2,7 +2,10 @@ TODO
 
 * txt-to-html
 - DONE: links
-- paragaphs
+- DONE: paragaphs
 - DONE: \\ -> <br />
 - PROBLEMATIC: forbid parsing decors in links
+- support for css files in templates
+   (autocopying them to output)
+- style makeblog CSS classes
 - document what's done and how to use it
