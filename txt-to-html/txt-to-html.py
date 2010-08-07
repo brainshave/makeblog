@@ -85,7 +85,7 @@ comments_fn = "" # instead of function just substitute it with text ""
 # TODO: To be added later: PARAGRAPHS
 #paragraph_expr = re.compile(r'(?:\n|\A).*(?=(?:\n\*)|(
 
-header_expr = re.compile(r'^(\*+)[\t ]*([^\n]*)[\t ]*$', re.MULTILINE)
+header_expr = re.compile(r'^(\*+)[\t ]+([^\n]*)[\t ]*$', re.MULTILINE)
 
 def header_fn(match):
     # count the stars in first group:
