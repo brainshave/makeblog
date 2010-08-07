@@ -176,6 +176,9 @@ for symbol, tag in decors:
     fn = r"<%s>\1</%s>" % (tag, tag)
     decor_patterns.append([pattern, fn])
 	  
+#### <BR /> pattern
+decor_patterns.append([re.compile(r'\\\\\n'), '<br />\n'])
+
 
 #### Merging patterns:
 patterns_fns = [[comments_expr, comments_fn],

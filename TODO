@@ -1,7 +1,7 @@
 TODO
 
 * txt-to-html
-- -links-
+- DONE: links
 - paragaphs
-- \\ -> <br />
-- forbid parsing decors in links
+- DONE: \\ -> <br />
+- PROBLEMATIC: forbid parsing decors in links

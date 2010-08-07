@@ -46,7 +46,7 @@ Tests:
 - [qwer uiop] Syntax.html
 - @tyuio ghjk tyui@ archive.html
 - sd fas Syntax.html! wefwe
-- [tyu erty erty wert] http://pstryk.net/asdf/asdf/asdf/ wefwe
+- [tyu erty erty wert] http://pstryk.net/asdf/asdf/asdf/#123 wefwe
 - QWER http://pstryk.net/~santamon! wfewe we
 - /asdf asdfas/ http://google.com/bsd/a/a_a_a
 
@@ -86,7 +86,8 @@ with auto width.
 To be thought.
 
 Each line of quote should begin with >, like this:
-> Gravity can't be held responsible for people falling in love.
+> Gravity can't be held responsible for people
+> falling in love.\\
 > /Albert Einstein/
 
 * My Beautiful English
