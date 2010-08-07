@@ -82,11 +82,8 @@ if attributes.get('index', 'true') != 'false' and options.get('-c'):
 comments_expr = re.compile(r'^%[^\n]*$', re.MULTILINE)
 comments_fn = "" # instead of function just substitute it with text ""
 
-# TODO: To be added later: PARAGRAPHS
-#paragraph_expr = re.compile(r'(?:\n|\A).*(?=(?:\n\*)|(
-
 paragraph_expr =  re.compile(r'(?:(?:\n|\A)(?![\t ]*[-#*>]\**\s)[^\n]*)+')
-#paragraph_fn = r'\n<p>\1\n</p>\n'
+
 def paragraph_fn(match):
     text = match.group(0).strip()
     classes = [['=>', 'makeblog_box makeblog_box_right'],

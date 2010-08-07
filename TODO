@@ -8,4 +8,5 @@ TODO
 - support for css files in templates
    (autocopying them to output)
 - style makeblog CSS classes
+- codeblocks
 - document what's done and how to use it
