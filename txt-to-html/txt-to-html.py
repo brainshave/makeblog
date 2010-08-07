@@ -85,6 +85,12 @@ comments_fn = "" # instead of function just substitute it with text ""
 # TODO: To be added later: PARAGRAPHS
 #paragraph_expr = re.compile(r'(?:\n|\A).*(?=(?:\n\*)|(
 
+paragraph_expr =  re.compile(r'(?:(?:\n|\A)(?![\t ]*[-#*>]\**\s)[^\n]*)+')
+#paragraph_fn = r'\n<p>\1\n</p>\n'
+def paragraph_fn(match):
+    text = match.group(0).strip()
+    return '\n<p>%(text)s</p>\n' % {'text': text}
+
 header_expr = re.compile(r'^(\*+)[\t ]+([^\n]*)[\t ]*$', re.MULTILINE)
 
 def header_fn(match):
@@ -182,6 +188,7 @@ decor_patterns.append([re.compile(r'\\\\\n'), '<br />\n'])
 
 #### Merging patterns:
 patterns_fns = [[comments_expr, comments_fn],
+                [paragraph_expr, paragraph_fn],
                 [header_expr, header_fn],
                 [list_expr, list_fn],
                 [quotes_expr, qutoes_fn]]

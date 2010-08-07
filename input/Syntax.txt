@@ -60,7 +60,7 @@ they point to existing file or if they're begining with @http://@ or
 inlined.
 
 
-* Font Styles
+** Font Styles
 - /italic/ between slashes
 - _underlines_ between underscores 
 - *bolds* between asterisks
@@ -79,8 +79,9 @@ with auto width.
 <= Analogical to =>.
 
 -> Paragraphs that begins with -> will be right-aligned. -> adsf ->
+asdf
 
->< Paragraphs that begins with >< will be centered.
+| Paragraphs that begins with | will be centered.
 
 * Code and Qutoes
 To be thought.
