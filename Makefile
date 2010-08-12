@@ -25,6 +25,7 @@ OUTDIR = output
 TMPDIR = tmp
 TEMPLATES_DIR = templates
 
+
 ARCHIVE_TEMPLATE = $(TEMPLATES_DIR)/article.html
 INDEX_TEMPLATE = $(TEMPLATES_DIR)/article.html
 # Include config file, so some variables can be overwritten
@@ -55,10 +56,19 @@ $(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) indexe
 	python indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest
 
 $(OUTDIR)/index.html : $(TMPDIR) $(OUTDIR)/archive.html
-	python txt-to-html/txt-to-html.py -i `cat $(TMPDIR)/latest` -o $@
+	python txt-to-html/txt-to-html.py -i `cat $(TMPDIR)/latest` -o $@ -t $(INDEX_TEMPLATE)
+
+#### copying media for templates (imgs, csss, fonts...)
+TEMPLATE_MEDIA = $(patsubst $(TEMPLATES_DIR)/media/%,$(OUTDIR)/media/%,$(wildcard $(TEMPLATES_DIR)/media/*))
+
+$(OUTDIR)/media/% : $(TEMPLATES_DIR)/media/%
+	cp -a $< $@
+
+$(TEMPLATES_DIR)/media :
+	mkdir $@
 
 ### Main part
-blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS)
+blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS) $(OUTDIR)/media $(TEMPLATE_MEDIA)
 
 $(OUTDIR) $(TMPDIR): 
 	mkdir -p $@
