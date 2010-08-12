@@ -86,7 +86,7 @@ for item in metadata:
 body += '</ul>'
 substitutions = {'title': os.environ['BLOG_ARCHIVE_TITLE'],
                  'body': body,
-                 'date': datetime.datetime.now().strftime(os.environ['BLOG_DATE_FORMAT']),
+                 'date': '', #datetime.datetime.now().strftime(os.environ['BLOG_DATE_FORMAT']),
                  'blog_title': os.environ['BLOG_TITLE'],
                  'blog_author': os.environ['BLOG_AUTHOR'],
                  'blog_email': os.environ['BLOG_EMAIL'],
