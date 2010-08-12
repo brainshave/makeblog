@@ -55,7 +55,7 @@ $(INDEXED_TARGETS) : $(TMPDIR)
 $(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) indexer.py
 	python indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest
 
-$(OUTDIR)/index.html : $(TMPDIR) $(OUTDIR)/archive.html
+$(OUTDIR)/index.html : $(TMPDIR) $(OUTDIR)/archive.html $(INDEX_TEMPLATE)
 	python txt-to-html/txt-to-html.py -i `cat $(TMPDIR)/latest` -o $@ -t $(INDEX_TEMPLATE)
 
 #### copying media for templates (imgs, csss, fonts...)
