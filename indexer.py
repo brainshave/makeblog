@@ -22,6 +22,7 @@ Fields used for now are:
 
 Options:
   -o output file
+  -l output name to the latest entry
   -t template to use
 
 Rest of parameters are cache files to parse.
@@ -35,7 +36,7 @@ header_format = '<h2 class="archive_month">%B %Y</h2>'
 ## load locale defaults from OS:
 locale.setlocale(locale.LC_ALL, '')
 
-opts, filenames = getopt.gnu_getopt(sys.argv[1:], 'o:t:h:')
+opts, filenames = getopt.gnu_getopt(sys.argv[1:], 'o:t:l:h')
 options = dict(opts)
 
 output_file = options['-o']
@@ -49,7 +50,14 @@ metadata = []
 for fname in filenames:
     metadata.append(eval(open(fname).read()))
 
+metadata = filter(lambda x: not 'index' in x
+                            or not len(x['index']) > 0
+                            or not x['index'][0].lower() == 'false',
+                  metadata)
 metadata.sort(key = lambda x: x['date'], reverse = True)
+#### output filename of the latest entry to file given with -l option
+if '-l' in options:
+    open(options['-l'], 'w').write(metadata[0]['input'])
 
 curr_month = metadata[0]['date']
 
@@ -78,5 +86,9 @@ for item in metadata:
 body += '</ul>'
 substitutions = {'title': os.environ['BLOG_ARCHIVE_TITLE'],
                  'body': body,
-                 'blog_title': os.environ['BLOG_TITLE']}
+                 'date': datetime.datetime.now().strftime('%c'),
+                 'blog_title': os.environ['BLOG_TITLE'],
+                 'blog_author': os.environ['BLOG_AUTHOR'],
+                 'blog_email': os.environ['BLOG_EMAIL'],
+                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE']}
 open(options['-o'], 'w').write(template.safe_substitute(substitutions))

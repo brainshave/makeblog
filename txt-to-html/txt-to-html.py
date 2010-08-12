@@ -7,9 +7,12 @@
 # This part:
 # TXT to HTML converter with nice org-mode-like syntax
 
-import sys, re, getopt, os
+import sys, re, getopt, os, locale
 from datetime import datetime
 from string import Template
+
+
+locale.setlocale(locale.LC_ALL, '')
 
 def print_help():
     print """TXT to HTML converter, uses org-mode-like syntax.
@@ -71,8 +74,8 @@ else:
     attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
     
 
-## Dump attributes to stderr:
-if attributes.get('index', 'true') != 'false' and options.get('-c'):
+## Dump attributes to file given with -c option:
+if options.get('-c'):
     open(options['-c'], 'w').write(str(attributes))
 
 #### STRUCTURE PARTS PARSERS:
@@ -212,7 +215,11 @@ for p in body:
     
 substitutions = {'title': title,
                  'body': body_text,
-                 'blog_title': os.environ['BLOG_TITLE']}
+                 'date': attributes['date'].strftime('%c'),
+                 'blog_title': os.environ['BLOG_TITLE'],
+                 'blog_author': os.environ['BLOG_AUTHOR'],
+                 'blog_email': os.environ['BLOG_EMAIL'],
+                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE']}
 
 open(options['-o'], 'w').write(template.safe_substitute(substitutions))
     

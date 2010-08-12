@@ -25,6 +25,8 @@ OUTDIR = output
 TMPDIR = tmp
 TEMPLATES_DIR = templates
 
+ARCHIVE_TEMPLATE = $(TEMPLATES_DIR)/article.html
+INDEX_TEMPLATE = $(TEMPLATES_DIR)/article.html
 # Include config file, so some variables can be overwritten
 # by user:
 -include config
@@ -39,7 +41,8 @@ export BLOG_ARCHIVE_TITLE
 -include */Makefile
 
 #### Indexer part, should be executed as a last one
-ALL_TARGETS += $(OUTDIR)/archive.html
+## Generating archive.html
+ALL_TARGETS += $(OUTDIR)/archive.html $(OUTDIR)/index.html
 
 $(ALL_TARGETS) : Makefile config
 
@@ -48,10 +51,11 @@ config :
 
 $(INDEXED_TARGETS) : $(TMPDIR)
 
-ARCHIVE_TEMPLATE = $(TEMPLATES_DIR)/article.html
+$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) indexer.py
+	python indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest
 
-$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE)
-	python indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE)
+$(OUTDIR)/index.html : $(TMPDIR) $(OUTDIR)/archive.html
+	python txt-to-html/txt-to-html.py -i `cat $(TMPDIR)/latest` -o $@
 
 ### Main part
 blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS)
