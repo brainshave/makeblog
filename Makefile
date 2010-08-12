@@ -70,7 +70,7 @@ $(TEMPLATES_DIR)/media :
 ### Main part
 blog_main: $(OUTDIR) $(TMPDIR) $(ALL_TARGETS) $(OUTDIR)/media $(TEMPLATE_MEDIA)
 
-$(OUTDIR) $(TMPDIR): 
+$(OUTDIR) $(TMPDIR) $(OUTDIR)/media: 
 	mkdir -p $@
 
 clean:
