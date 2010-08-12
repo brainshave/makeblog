@@ -11,6 +11,7 @@ BLOG_AUTHOR = Anonymous Coward
 BLOG_EMAIL = me@inter.net
 BLOG_TITLE = Makeblog-Made Blog
 BLOG_ARCHIVE_TITLE = Archives
+BLOG_DATE_FORMAT = %Y-%m-%d %A
 
 blog: blog_main
 
@@ -36,6 +37,7 @@ export BLOG_AUTHOR
 export BLOG_EMAIL
 export BLOG_TITLE
 export BLOG_ARCHIVE_TITLE
+export BLOG_DATE_FORMAT
 
 # Include rules from all makefiles in "makefiles" dir:
 -include */*.mk
