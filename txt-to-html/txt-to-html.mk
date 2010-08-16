@@ -10,11 +10,11 @@
 HTML_TARGETS += $(patsubst $(INDIR)/%.txt,$(OUTDIR)/%.html,$(wildcard $(INDIR)/*.txt))
 ALL_TARGETS += $(HTML_TARGETS)
 
-INDEXED_TARGETS += $(patsubst $(OUTDIR)/%.html,$(TMPDIR)/%.html-cache,$(HTML_TARGETS))
+INDEXED_TARGETS += $(patsubst $(INDIR)/%.txt,$(TMPDIR)/%.html-cache,$(wildcard $(INDIR)/*.txt))
 
-$(HTML_TARGETS) : $(TEMPLATES_DIR)/article.html txt-to-html/txt-to-html.py txt-to-html/txt-to-html.mk 
+$(HTML_TARGETS) : $(TEMPLATES_DIR)/article.html $(MAKEBLOG_PATH)/txt-to-html/txt-to-html.py $(MAKEBLOG_PATH)/txt-to-html/txt-to-html.mk 
 
 $(TMPDIR)/%.html-cache : $(OUTDIR)/%.html
 
 $(OUTDIR)/%.html : $(INDIR)/%.txt
-	python txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(OUTDIR)/%,$(TMPDIR)/%-cache,$@)
+	python $(MAKEBLOG_PATH)/txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(INDIR)/%.txt,$(TMPDIR)/%.html-cache,$<)

@@ -12,6 +12,7 @@ BLOG_EMAIL = me@inter.net
 BLOG_TITLE = Makeblog-Made Blog
 BLOG_ARCHIVE_TITLE = Archives
 BLOG_DATE_FORMAT = %Y-%m-%d %A
+MAKEBLOG_PATH = .
 
 blog: blog_main
 
@@ -38,10 +39,11 @@ export BLOG_EMAIL
 export BLOG_TITLE
 export BLOG_ARCHIVE_TITLE
 export BLOG_DATE_FORMAT
+export MAKEBLOG_PATH
 
 # Include rules from all makefiles in "makefiles" dir:
--include */*.mk
--include */Makefile
+-include $(MAKEBLOG_PATH)/*/*.mk
+-include $(MAKEBLOG_PATH)/*/Makefile
 
 #### Indexer part, should be executed as a last one
 ## Generating archive.html
@@ -54,11 +56,11 @@ config :
 
 $(INDEXED_TARGETS) : $(TMPDIR)
 
-$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) indexer.py
-	python indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest
+$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) $(MAKEBLOG_PATH)/indexer.py
+	python $(MAKEBLOG_PATH)/indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest
 
 $(OUTDIR)/index.html : $(TMPDIR) $(OUTDIR)/archive.html $(INDEX_TEMPLATE)
-	python txt-to-html/txt-to-html.py -i `cat $(TMPDIR)/latest` -o $@ -t $(INDEX_TEMPLATE)
+	python $(MAKEBLOG_PATH)/txt-to-html/txt-to-html.py -i `cat $(TMPDIR)/latest` -o $@ -t $(INDEX_TEMPLATE)
 
 #### copying media for templates (imgs, csss, fonts...)
 TEMPLATE_MEDIA = $(patsubst $(TEMPLATES_DIR)/media/%,$(OUTDIR)/media/%,$(wildcard $(TEMPLATES_DIR)/media/*))
@@ -76,4 +78,5 @@ $(OUTDIR) $(TMPDIR) $(OUTDIR)/media:
 	mkdir -p $@
 
 clean:
-	rm -rf $(OUTDIR)/* $(TMPDIR)
+	rm -rf $(ALL_TARGETS) $(TMPDIR) $(OUTDIR)/media
+#rm -rf $(OUTDIR)/* $(TMPDIR)

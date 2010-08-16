@@ -44,7 +44,7 @@ output_file = options['-o']
 template = Template(open(options.get('-t', "templates/article.html")).read())
 
 # print output_file
-outdir = re.compile(r'(.*\/+)[^/]*').match(output_file).group(0)
+#m = re.compile(r'(.*\/+)[^/]*').match(output_file)
 
 metadata = []
 for fname in filenames:
@@ -63,7 +63,12 @@ curr_month = metadata[0]['date']
 
 body = curr_month.strftime(header_format + '<ul class="archive_list">\n')
 
-outdir = re.compile(r'(.*\/+)[^/]*').match(output_file).group(1)
+m = re.compile(r'(.*\/+)[^/]*').match(output_file)
+if m:
+    outdir = m.group(1)
+else:
+    outdir = ""
+
 ### print outdir
 
 for item in metadata:
