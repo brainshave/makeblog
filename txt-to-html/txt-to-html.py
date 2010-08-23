@@ -38,30 +38,60 @@ template = Template(open(options.get('-t', "templates/article.html")).read())
 # read file and split into list of paragraphs
 input_text = open(options['-i']).read()
 
-ParserElement.setDefaultWhitespaceChars(' \t')
 
 #test cases: empty file, one-line file, 
 
-title = (CharsNotIn('\n') + Suppress('\n') * (0,1)) * (0,None) \
-    + Suppress(White())
+#title = Combine( ZeroOrMore( CharsNotIn('\n') + Suppress(Optional('\n')))) \
+#    + Suppress( ZeroOrMore('\n'))
 
-inline_whitespace = Suppress(White(' \t') * (0,None))
+# inline_whitespace = Suppress( ZeroOrMore( White(' \t')))
 
-attribute_key = inline_whitespace + CharsNotIn(':\n') + inline_whitespace
-attribute_item = inline_whitespace + CharsNotIn(',\n') + inline_whitespace
-attribute_list = Group((attribute_item + Suppress(',') * (0,1)) * (0,None))
-attribute_row = Group(attribute_key + Suppress(':') + attribute_list + Suppress('\n') * (0,1))
-attr_map = Group(attribute_row * (0,None))
+# attribute_key = inline_whitespace + CharsNotIn(':\n') + inline_whitespace
+# attribute_item = inline_whitespace + CharsNotIn(',\n') + inline_whitespace
+# attribute_list = Group( ZeroOrMore( attribute_item + Suppress( Optional(','))))
+# attribute_row = Group( attribute_key + Suppress(':') + attribute_list \
+#                            + Suppress(Optional('\n')))
+# attr_map = Group( ZeroOrMore( attribute_row))
 
-document = title + attr_map # + \
+# styled_line = inline_whitespace + ZeroOrMore(CharsNotIn('\n')) \
+#     + inline_whitespace + Suppress( Optional('\n'))
+
+# header = LineStart() + Word('*') + styled_line
+
+# paragraph = OneOrMore(styled_line)
+
+
+ParserElement.setDefaultWhitespaceChars(' \t')
+
+title = Combine( ZeroOrMore( CharsNotIn('\n') + Suppress( Optional('\n'))))
+
+attr_key = CharsNotIn('\n:')
+attr_item = CharsNotIn('\n,')
+attr_row = Group( attr_key
+                  + Suppress(":")
+                  + Group( ZeroOrMore( attr_item 
+                                       + Suppress( Optional(",")))))
+attr_map = ZeroOrMore( attr_row + Suppress( Optional('\n')))
+
+attr_map.setParseAction(lambda x: dict(x.asList()))
+
+empty_lines = Suppress(Optional( White('\n')))
+
+document = title + empty_lines + attr_map  + empty_lines #\
+    # + Suppress(White()) \
+    # + ZeroOrMore \
     # (
-    # header & 
-    # blockquote &
-    # unordered_list & 
-    # ordered_list & 
-    # code_block &
-    # paragraph
-    # ) \
-    # * (0,None)
+    #   Group
+    #   (
+    #     header
+    #     # & blockquote
+    #     # & code_block
+    #     # & unordered_list
+    #     # & ordered_list
+    #     #| paragraph
+    #   ) + Suppress( Optional( '\n'))
+    # ) 
+
+#print document.verify()
 sadf = document.parseString(input_text)
-pprint(sadf.asList(), indent=2)
+pprint(sadf.asList())
