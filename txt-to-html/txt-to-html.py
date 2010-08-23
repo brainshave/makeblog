@@ -75,22 +75,47 @@ attr_map = ZeroOrMore( attr_row + Suppress( Optional('\n')))
 
 attr_map.setParseAction(lambda x: dict(x.asList()))
 
-empty_lines = Suppress(Optional( White('\n')))
+header = LineStart() + Word('*') + CharsNotIn('\n') + Suppress( Optional('\n'))
 
-document = title + empty_lines + attr_map  + empty_lines #\
-    # + Suppress(White()) \
-    # + ZeroOrMore \
-    # (
-    #   Group
-    #   (
-    #     header
-    #     # & blockquote
-    #     # & code_block
-    #     # & unordered_list
-    #     # & ordered_list
-    #     #| paragraph
-    #   ) + Suppress( Optional( '\n'))
-    # ) 
+decors_mapping = {'/': 'em',
+                  '_': 'u',
+                  '*': 'strong',
+                  '-': 'del',
+                  '@': 'code'}
+decor_chars = reduce(lambda x,y: x+y, decors_mapping.keys())
+
+undecorated_expr = ""
+
+decors_delimiter = Word(decor_chars, exact=1)
+#decors = decors_delimiter + CharsNotIn(decor_chars) + matchPreviousExpr(decors_delimiter)
+
+decorated_text = decors_delimiter +  matchPreviousExpr(decors_delimiter)
+
+paragraph = Optional( Literal("=>") 
+                      | Literal("<=") 
+                      | Literal("->") 
+                      | Literal("|")
+                      ) \
+                  + OneOrMore(
+                          CharsNotIn('\n')
+                          + Suppress( Optional('\n')))
+
+
+empty_lines = Suppress( Optional( White('\n')))
+
+document = title + empty_lines + attr_map  + empty_lines \
+    + ZeroOrMore \
+    (
+      Group
+      (
+        header
+        # & blockquote
+        # & code_block
+        # & unordered_list
+        # & ordered_list
+        | paragraph
+      ) + empty_lines
+    ) 
 
 #print document.verify()
 sadf = document.parseString(input_text)
