@@ -84,21 +84,27 @@ decors_mapping = {'/': 'em',
                   '@': 'code'}
 decor_chars = reduce(lambda x,y: x+y, decors_mapping.keys())
 
+exprs = []
+for _ in decor_chars:
+    exprs.append(Forward())
+
+exprs_alt = CharsNotIn(decor_chars) | reduce(lambda x,y: x | y, exprs)
+
+for index, char in enumerate(decor_chars):
+    exprs[index] << Group(char + ZeroOrMore(exprs_alt) + char)
+
 undecorated_expr = ""
 
-decors_delimiter = Word(decor_chars, exact=1)
-#decors = decors_delimiter + CharsNotIn(decor_chars) + matchPreviousExpr(decors_delimiter)
+# Optional(CharsNotIn(decor_chars)) \
+#                    + Optional( OneOrMore( Word(decor_chars) + CharsNotIn(" \t", exact=1))).parseString("asdf@asdf")
 
-decorated_text = decors_delimiter +  matchPreviousExpr(decors_delimiter)
+a = ""
 
-paragraph = Optional( Literal("=>") 
-                      | Literal("<=") 
-                      | Literal("->") 
-                      | Literal("|")
-                      ) \
-                  + OneOrMore(
-                          CharsNotIn('\n')
-                          + Suppress( Optional('\n')))
+roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + CharsNotIn('\n'))
+roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
+
+paragraph = Optional( oneOf("=> <= -> |")) \
+    + OneOrMore( CharsNotIn('\n') + Suppress( Optional('\n')))
 
 
 empty_lines = Suppress( Optional( White('\n')))
@@ -111,7 +117,8 @@ document = title + empty_lines + attr_map  + empty_lines \
         header
         # & blockquote
         # & code_block
-        # & unordered_list
+        | roll_block
+        # unordered_list
         # & ordered_list
         | paragraph
       ) + empty_lines
