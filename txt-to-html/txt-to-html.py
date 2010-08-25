@@ -90,7 +90,12 @@ decor_chars = reduce(lambda x,y: x+y, decors_mapping.keys())
 
 # TODO: I REALLY need to work on this one, because it have to define
 # what's on inside and outside of any of decorated_exprs
-undecorated_expr = CharsNotIn(decor_chars + ' \t\r\n')
+undecorated_expr = CharsNotIn(decor_chars + ' \t\r\n') # <- Space Train ;) 2010-08-25, 20:06 CEST
+
+# Word that contains some of the decor_chars but only one
+# actually will match to any word, but will be placed after
+# decorated_expr's in inline_atom alternative expressions
+fallback_expr = CharsNotIn(' \t\r\n')
 
 # Decorated text can be recursive so we need to use Forward()
 # to declare body later
@@ -99,15 +104,17 @@ decorated_exprs = [Forward() for _ in decors_mapping]
 
 ## URL
 url = Suppress( White(' \t')) \
-    + ( Group(Literal("http://") + CharsNotIn(' \t\n\t'))
+    + ( Group(Literal("http://") + CharsNotIn(' \t\r\n'))
         | Group( Optional("http://") 
                  + OneOrMore( CharsNotIn(' \t\r\n.') + ".")
                  + CharsNotIn(' \t\r\n!.') + ~Literal("!")))
 
 # This is what can be contained in any line of text,
 # undecorated or decorated text.
-inline_atom = (undecorated_expr | reduce(lambda x,y: x | y, decorated_exprs)) \
-    + Optional(url)
+inline_atom = ( undecorated_expr | reduce(lambda x,y: x | y, decorated_exprs)
+                #| fallback_expr
+                ) \
+              + Optional(url)
 
 inline_expr = OneOrMore(inline_atom + Optional(White(' \t')))
 
@@ -120,7 +127,8 @@ for index, char in enumerate(decor_chars):
     decorated_exprs[index] << Group(char + inline_expr + char)
 
 #pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
-expr = "/wer asdf/ http://asdfwefw/sadfsa/ -*/ a q/w.er /*-"
+expr = "&/wer asdf/& http://asdfwefw/sadfsa/ -*/ a q/w.er /*-"
+expr = "@a@"
 pprint(inline_expr.parseString(expr).asList())
 
 
