@@ -96,10 +96,6 @@ undecorated_expr = Combine( CharsNotIn(decor_chars + ' \t\r\n')
                                         
 # ' \t\r\n' its "Space Train" for remembering ;) 2010-08-25, 20:06 CEST
 
-# Word that contains some of the decor_chars but only one
-# actually will match to any word, but will be placed after
-# decorated_expr's in inline_atom alternative expressions
-#fallback_expr = CharsNotIn(' \t\r\n')
 
 # Decorated text can be recursive so we need to use Forward()
 # to declare body later
@@ -133,7 +129,7 @@ for index, char in enumerate(decor_chars):
 
 #pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
 expr = "w@er as*d*f.asdf uip http://asdfwefw/sadfsa/ -*/ a q/w.er /*-"
-#expr = "@@code@"
+expr = "@@"
 pprint(inline_expr.parseString(expr).asList())
 
 
@@ -165,4 +161,4 @@ document = title + empty_lines + attr_map  + empty_lines \
 
 #print document.verify()
 sadf = document.parseString(input_text)
-#pprint(sadf.asList())
+pprint(sadf.asList())
