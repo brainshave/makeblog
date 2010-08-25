@@ -96,19 +96,20 @@ undecorated_expr = CharsNotIn(decor_chars + ' \t\r\n')
 # to declare body later
 decorated_exprs = [Forward() for _ in decors_mapping]
 
-# This is what can be contained in any line of text,
-# undecorated or decorated text.
-inline_atom = undecorated_expr | reduce(lambda x,y: x | y, decorated_exprs)
-
 
 ## URL
-url = inline_atom + White(' \t') \
-      + Group( Optional("http://") 
-               + OneOrMore( CharsNotIn(' \t\n.') + ".")
-               + CharsNotIn(' \t\n!.') + ~Literal("!"))
+url = Suppress( White(' \t')) \
+    + ( Group(Literal("http://") + CharsNotIn(' \t\n\t'))
+        | Group( Optional("http://") 
+                 + OneOrMore( CharsNotIn(' \t\r\n.') + ".")
+                 + CharsNotIn(' \t\r\n!.') + ~Literal("!")))
 
+# This is what can be contained in any line of text,
+# undecorated or decorated text.
+inline_atom = (undecorated_expr | reduce(lambda x,y: x | y, decorated_exprs)) \
+    + Optional(url)
 
-inline_expr = OneOrMore((inline_atom) + Optional(White(' \t')))
+inline_expr = OneOrMore(inline_atom + Optional(White(' \t')))
 
 # Lets push into decorated_exprs expressions of
 # delimiter + zero or more inline_atom's + delimiter.
@@ -119,7 +120,7 @@ for index, char in enumerate(decor_chars):
     decorated_exprs[index] << Group(char + inline_expr + char)
 
 #pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
-expr = "/*-asdf-*/ -*/qwer/*-"
+expr = "/wer asdf/ http://asdfwefw/sadfsa/ -*/ a q/w.er /*-"
 pprint(inline_expr.parseString(expr).asList())
 
 
@@ -151,4 +152,4 @@ document = title + empty_lines + attr_map  + empty_lines \
 
 #print document.verify()
 sadf = document.parseString(input_text)
-pprint(sadf.asList())
+#pprint(sadf.asList())
