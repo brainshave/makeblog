@@ -41,30 +41,21 @@ input_text = open(options['-i']).read()
 
 #test cases: empty file, one-line file, 
 
-#title = Combine( ZeroOrMore( CharsNotIn('\n') + Suppress(Optional('\n')))) \
-#    + Suppress( ZeroOrMore('\n'))
-
-# inline_whitespace = Suppress( ZeroOrMore( White(' \t')))
-
-# attribute_key = inline_whitespace + CharsNotIn(':\n') + inline_whitespace
-# attribute_item = inline_whitespace + CharsNotIn(',\n') + inline_whitespace
-# attribute_list = Group( ZeroOrMore( attribute_item + Suppress( Optional(','))))
-# attribute_row = Group( attribute_key + Suppress(':') + attribute_list \
-#                            + Suppress(Optional('\n')))
-# attr_map = Group( ZeroOrMore( attribute_row))
-
-# styled_line = inline_whitespace + ZeroOrMore(CharsNotIn('\n')) \
-#     + inline_whitespace + Suppress( Optional('\n'))
-
-# header = LineStart() + Word('*') + styled_line
-
-# paragraph = OneOrMore(styled_line)
-
-
+###### Parser start
+# Lineends are significant, so setup default whitespace chars
+# to space + tab. (default value is " \t\n\r")
 ParserElement.setDefaultWhitespaceChars(' \t')
 
+#### Head part
+
+## Title:
+## Zero or more lines with some chars that are not \n.
+## Empty line won't match, so title will be all first non-emtpy lines.
 title = Combine( ZeroOrMore( CharsNotIn('\n') + Suppress( Optional('\n'))))
 
+## Attributes map:
+## Block of non-empty lines with syntax:
+## attr_key: attr_item1, attr_item2
 attr_key = CharsNotIn('\n:')
 attr_item = CharsNotIn('\n,')
 attr_row = Group( attr_key
@@ -73,39 +64,73 @@ attr_row = Group( attr_key
                                        + Suppress( Optional(",")))))
 attr_map = ZeroOrMore( attr_row + Suppress( Optional('\n')))
 
+# Attributes map is converted to dict when parsing:
 attr_map.setParseAction(lambda x: dict(x.asList()))
 
+#### Body part
+
+## Header:
+## Will match to a single line that starts with a continuous sequence 
 header = LineStart() + Word('*') + CharsNotIn('\n') + Suppress( Optional('\n'))
 
+
+## Decorators:
+## Bold text, underline, code and so on.
+
+# decors_mapping is a map of decorated text delimiter to html tag
 decors_mapping = {'/': 'em',
                   '_': 'u',
                   '*': 'strong',
                   '-': 'del',
-                  '@': 'code'}
+                  '@': 'code',
+                  '&': None}
+
+# lets grab all delimiters with one string
 decor_chars = reduce(lambda x,y: x+y, decors_mapping.keys())
 
-exprs = []
-for _ in decor_chars:
-    exprs.append(Forward())
+# TODO: I REALLY need to work on this one, because it have to define
+# what's on inside and outside of any of decorated_exprs
+undecorated_expr = CharsNotIn(decor_chars + ' \t\r\n')
 
-exprs_alt = CharsNotIn(decor_chars) | reduce(lambda x,y: x | y, exprs)
+# Decorated text can be recursive so we need to use Forward()
+# to declare body later
+decorated_exprs = [Forward() for _ in decors_mapping]
+
+# This is what can be contained in any line of text,
+# undecorated or decorated text.
+inline_atom = undecorated_expr | reduce(lambda x,y: x | y, decorated_exprs)
+
+
+## URL
+url = inline_atom + White(' \t') \
+      + Group( Optional("http://") 
+               + OneOrMore( CharsNotIn(' \t\n.') + ".")
+               + CharsNotIn(' \t\n!.') + ~Literal("!"))
+
+
+inline_expr = OneOrMore((inline_atom) + Optional(White(' \t')))
+
+# Lets push into decorated_exprs expressions of
+# delimiter + zero or more inline_atom's + delimiter.
+# Note that inline_expr is recursively refering to all of 
+# decorated_expr's.
 
 for index, char in enumerate(decor_chars):
-    exprs[index] << Group(char + ZeroOrMore(exprs_alt) + char)
+    decorated_exprs[index] << Group(char + inline_expr + char)
 
-undecorated_expr = ""
+#pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
+expr = "/*-asdf-*/ -*/qwer/*-"
+pprint(inline_expr.parseString(expr).asList())
 
-# Optional(CharsNotIn(decor_chars)) \
-#                    + Optional( OneOrMore( Word(decor_chars) + CharsNotIn(" \t", exact=1))).parseString("asdf@asdf")
 
-a = ""
-
-roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + CharsNotIn('\n'))
+roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + inline_expr)
 roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
 
 paragraph = Optional( oneOf("=> <= -> |")) \
-    + OneOrMore( CharsNotIn('\n') + Suppress( Optional('\n')))
+    + OneOrMore( inline_expr + Suppress( Optional('\n')))
 
+
+#### Document Layout:
 
 empty_lines = Suppress( Optional( White('\n')))
 
