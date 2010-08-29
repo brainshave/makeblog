@@ -154,15 +154,15 @@ for index, char in enumerate(decor_chars):
     decorated_exprs[index].setParseAction(decorate)
 
 #pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
-test_exprs = ["w@er as*d*f.asdf uip http://asdfwefw/sadfsa/ -*/ a q/w.er /*-",
-              "&asdf @@ asdf&",
-              "@asdf",
-              "@http://@"#,
-              #"@_@",
-              #"@@@"
-              ]
-for t in test_exprs:
-    pprint(inline_expr.parseString(t).asList())
+# test_exprs = ["w@er as*d*f.asdf uip http://asdfwefw/sadfsa/ -*/ a q/w.er /*-",
+#               "&asdf @@ asdf&",
+#               "@asdf",
+#               "@http://@"#,
+#               #"@_@",
+#               #"@@@"
+#               ]
+# for t in test_exprs:
+#     pprint(inline_expr.parseString(t).asList())
 
 
 ## Header:
@@ -175,65 +175,37 @@ def do_header(item):
 
 header.setParseAction(do_header)
 
-roll_stack = [1]
-
-
-unordered_list = Forward()
-ordered_list = Forward()
-
-any_list = unordered_list ^ ordered_list
-
-unordered_elem = "-" + Group(inline_expr) + Optional(any_list)
-ordered_elem = "#" + Group(inline_expr) + Optional(any_list)
-
-def do_list_elem(item):
-    pass
-#roll_elem = ordered_elem | unordered_elem
-
-unordered_list << indentedBlock(unordered_elem, roll_stack, True)
-ordered_list << indentedBlock(ordered_elem, roll_stack, True)
-
-ordered_list_first_level = indentedBlock(ordered_elem, roll_stack, False)
-unordered_list_first_level = indentedBlock(unordered_elem, roll_stack, False)
-
-roll_block = OneOrMore(ordered_list_first_level | unordered_list_first_level )
-
-# simple approach:
-list_item = Forward()
-list_item << oneOf("- #") + inline_expr \
-             + Optional( indentedBlock(list_item, roll_stack)
-
-pprint(roll_block.parseString("""- asdf
-- -qwer-
-  # uiop asdfas
-- werew sadf a
- - bnm asdfa
- -ghjkl
-   -456789
-     -789
-# asdf
-""").asList())
-
-roll_stack.
-
-pprint(roll_block.parseString("""- item one
-  # asdf
-    - uiop
-  # qwer
-- item two
-  - subitem of "item two", identation matters.
-    - obvious.
-  # obviously there can be numbered lists.
-  # they start with hash mark.""").asList())
-
 ### old rolls:
-roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + ~( Literal(">")) + inline_expr)
+roll_elem = Group( Combine(White(' \t') * (0,1)) + oneOf("- #") + ~( Literal(">")) + inline_expr)
 roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
 
 def do_roll(item):
     tag_stack = []
+    text = []
     for line in item:
-        pass
+        depth = len(line[0].expandtabs(8))
+        tag = {'-': 'ul', '#': 'ol'}[line[1]]
+        content = line[2:]
+        if len(tag_stack) == 0 or depth > tag_stack[-1][1]:
+            tag_stack.append([tag, depth])
+            text.append("<%s>\n" % tag)
+
+        while depth < tag_stack[-1][1]:
+            old_tag, _ = tag_stack.pop()
+            text.append("</%s>\n" % old_tag)
+            
+        if tag_stack[-1][0] != tag and tag_stack[1][1] ==  depth:
+            old_tag, _ = tag_stack.pop()
+            tag_stack.append([tag, depth])
+            text += ["</%s>\n" % old_tag, "<%s>\n" % tag]
+
+        text += ["<li>", content, "</li>\n"]
+    tag_stack.reverse()
+    for tag, _ in tag_stack:
+    	text.append("</%s>" % tag)
+    return text
+
+roll_block.setParseAction(do_roll)
 
 # Bandwidth-saving maniacs will kill me for this makeblog_ prefixes :P
 paragraph_classes = {'=>': 'makeblog_box makeblog_box_right',
@@ -253,7 +225,7 @@ def do_paragraph(item):
     else:
         pclass =  None
     if pclass:
-        return ['<p class="%s">' % pclass, item[1:], '</p>']
+        return ['<p class="%s">' % pclass, item.asList()[1:], '</p>']
     else:
         return ['<p>', item.asList(), '</p>']
 
@@ -268,29 +240,29 @@ blockquote = LineStart() + Literal(">>") + Suppress( White('\r\n'))\
              + Literal("<<")
 
 def do_blockquote(item):
-    return ["<blockquote>", item[1:-1], "</blockquote>"]
+    return ["<blockquote>", item.asList()[1:-1], "</blockquote>"]
 
 blockquote.setParseAction(do_blockquote)
 
-pprint(blockquote.parseString(""">>
+# pprint(blockquote.parseString(""">>
 
-ASDF
-QWER
+# ASDF
+# QWER
 
-/Albert Einstein/
+# /Albert Einstein/
 
-=> efwe
+# => efwe
 
-- asdf
-  # sadf
-- werwe
-<<
+# - asdf
+#   # sadf
+# - werwe
+# <<
 
->>
-asdf
-asdf
-sad
-<<""").asList())
+# >>
+# asdf
+# asdf
+# sad
+# <<""").asList())
 
 ### Code:
 "@@"
@@ -306,17 +278,17 @@ def do_code_block(item):
 
 code_block.setParseAction(do_code_block)
 
-pprint(code_block.parseString("""@@
-sdf a
-  sdf as   
-  as 
-  as df
-@@
- asdf
+# pprint(code_block.parseString("""@@
+# sdf a
+#   sdf as   
+#   as 
+#   as df
+# @@
+#  asdf
 
-@@
+# @@
 
-qwer""").asList())
+# qwer""").asList())
 
 #### Document Layout:
 
@@ -333,5 +305,57 @@ document = title + empty_lines + attr_map  + empty_lines \
     ) 
 
 #print document.verify()
-#sadf = document.parseString(input_text)
-#pprint(sadf.asList())
+parsed_tree = document.parseString(input_text)
+#pprint(parsed_tree.asList())
+
+def merge_lists(root):
+    ret = ""
+    for item in root:
+        t = type(item)
+        if t == str:
+            ret += item
+        elif t == list:
+            ret += merge_lists(item)
+        elif item == None:
+            pass
+        else:
+            ret += merge_lists(item.asList())
+    return ret
+
+body_offset = 0
+#title = ""
+if len(parsed_tree) > 0:
+    title = parsed_tree[0]
+    body_offset += 1
+
+if len(parsed_tree) > 1:
+    attr_map = parsed_tree[1]
+    if type(attr_map) == dict:
+        attributes = attr_map
+        body_offset += 1
+
+attributes['title'] = title
+attributes['input'] = options['-i']
+attributes['output'] = options['-o']
+
+if 'date' in attributes:
+    attributes['date'] = datetime.strptime(attributes['date'][0].strip(), '%Y-%m-%d')
+else:
+    attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
+    
+
+## Dump attributes to file given with -c option:
+if options.get('-c'):
+    open(options['-c'], 'w').write(str(attributes))
+    
+body_text = merge_lists(parsed_tree[body_offset:])
+
+substitutions = {'title': title,
+                 'body': body_text,
+                 'date': attributes['date'].strftime(os.environ['BLOG_DATE_FORMAT']),
+                 'blog_title': os.environ['BLOG_TITLE'],
+                 'blog_author': os.environ['BLOG_AUTHOR'],
+                 'blog_email': os.environ['BLOG_EMAIL'],
+                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE']}
+
+open(options['-o'], 'w').write(template.safe_substitute(substitutions))
