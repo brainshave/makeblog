@@ -68,6 +68,8 @@ attr_row = Group( attr_key
 attr_map = ZeroOrMore( attr_row + Suppress( Optional('\n')))
 
 # Attributes map is converted to dict when parsing:
+
+
 attr_map.setParseAction(lambda x: dict(x.asList()))
 
 #### Body part
@@ -79,7 +81,7 @@ attr_map.setParseAction(lambda x: dict(x.asList()))
 decors_mapping = {'/': 'em',
                   '_': 'u',
                   '*': 'strong',
-                  '-': 'del',
+                  #'-': 'del',
                   '@': 'code',
                   '&': None}
 
@@ -153,17 +155,6 @@ for index, char in enumerate(decor_chars):
     decorated_exprs[index] << char + inline_expr + char
     decorated_exprs[index].setParseAction(decorate)
 
-#pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
-# test_exprs = ["w@er as*d*f.asdf uip http://asdfwefw/sadfsa/ -*/ a q/w.er /*-",
-#               "&asdf @@ asdf&",
-#               "@asdf",
-#               "@http://@"#,
-#               #"@_@",
-#               #"@@@"
-#               ]
-# for t in test_exprs:
-#     pprint(inline_expr.parseString(t).asList())
-
 
 ## Header:
 ## Will match to a single line that starts with a continuous sequence 
@@ -233,7 +224,7 @@ paragraph.setParseAction(do_paragraph)
 
 ### Blockquote:
 
-embeddable = Group(paragraph | roll_block)
+embeddable = Group(roll_block | paragraph)
 
 blockquote = LineStart() + Literal(">>") + Suppress( White('\r\n'))\
              + ZeroOrMore(embeddable + empty_lines) \
@@ -243,26 +234,6 @@ def do_blockquote(item):
     return ["<blockquote>", item.asList()[1:-1], "</blockquote>"]
 
 blockquote.setParseAction(do_blockquote)
-
-# pprint(blockquote.parseString(""">>
-
-# ASDF
-# QWER
-
-# /Albert Einstein/
-
-# => efwe
-
-# - asdf
-#   # sadf
-# - werwe
-# <<
-
-# >>
-# asdf
-# asdf
-# sad
-# <<""").asList())
 
 ### Code:
 "@@"
@@ -278,17 +249,6 @@ def do_code_block(item):
 
 code_block.setParseAction(do_code_block)
 
-# pprint(code_block.parseString("""@@
-# sdf a
-#   sdf as   
-#   as 
-#   as df
-# @@
-#  asdf
-
-# @@
-
-# qwer""").asList())
 
 #### Document Layout:
 
@@ -305,7 +265,7 @@ document = title + empty_lines + attr_map  + empty_lines \
     ) 
 
 #print document.verify()
-parsed_tree = document.parseString(input_text)
+parsed_tree = document.parseString(input_text, True)
 #pprint(parsed_tree.asList())
 
 def merge_lists(root):
@@ -339,7 +299,7 @@ attributes['input'] = options['-i']
 attributes['output'] = options['-o']
 
 if 'date' in attributes:
-    attributes['date'] = datetime.strptime(attributes['date'][0].strip(), '%Y-%m-%d')
+    attributes['date'] = datetime.strptime(attributes['date'][0], '%Y-%m-%d')
 else:
     attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
     
