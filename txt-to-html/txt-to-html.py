@@ -169,7 +169,11 @@ for t in test_exprs:
 ## Will match to a single line that starts with a continuous sequence 
 header = LineStart() + Word('*') + inline_expr + Suppress( Optional('\n'))
 
-do_header = ""
+def do_header(item):
+    tag = "h%d" % (len(item[0]) + 1)
+    return ["<%s>" % tag, item[1:], "</%s>" % tag]
+
+header.setParseAction(do_header)
 
 roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + ~( Literal(">")) + inline_expr)
 roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
