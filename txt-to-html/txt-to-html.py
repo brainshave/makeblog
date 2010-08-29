@@ -187,7 +187,7 @@ unordered_elem = "-" + Group(inline_expr) + Optional(any_list)
 ordered_elem = "#" + Group(inline_expr) + Optional(any_list)
 
 def do_list_elem(item):
-    
+    pass
 #roll_elem = ordered_elem | unordered_elem
 
 unordered_list << indentedBlock(unordered_elem, roll_stack, True)
@@ -197,6 +197,11 @@ ordered_list_first_level = indentedBlock(ordered_elem, roll_stack, False)
 unordered_list_first_level = indentedBlock(unordered_elem, roll_stack, False)
 
 roll_block = OneOrMore(ordered_list_first_level | unordered_list_first_level )
+
+# simple approach:
+list_item = Forward()
+list_item << oneOf("- #") + inline_expr \
+             + Optional( indentedBlock(list_item, roll_stack)
 
 pprint(roll_block.parseString("""- asdf
 - -qwer-
@@ -208,6 +213,18 @@ pprint(roll_block.parseString("""- asdf
      -789
 # asdf
 """).asList())
+
+roll_stack.
+
+pprint(roll_block.parseString("""- item one
+  # asdf
+    - uiop
+  # qwer
+- item two
+  - subitem of "item two", identation matters.
+    - obvious.
+  # obviously there can be numbered lists.
+  # they start with hash mark.""").asList())
 
 ### old rolls:
 roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + ~( Literal(">")) + inline_expr)
