@@ -65,6 +65,7 @@ The word immediately before address will be text of the link.
 If it's ! then link address will be used.
 
 Tests:
+
 - ! http://pstryk.net/~santamon sdfs  sadf
 - /UIOP/ http://ps-tr@yk.net/~sant@amon sdfwefw
 - ASDF Syntax.html wefwe
@@ -72,7 +73,7 @@ Tests:
 - @tyuio ghjk tyui@ archive.html
 - sd fas Syntax.html! wefwe
 - &tyu erty erty wert& http://pstryk.net/asdf/asdf/asdf/#123 wefwe
-- QWER http://pstryk.net/~santamon! wfewe we
+- QWER ~ http://pstryk.net/~santamon! wfewe we
 - /asdf asdfas/ http://google.com/bsd/a/a_a_a
 
 Also, appending ! to the address will make it plain text.

@@ -67,10 +67,10 @@ attr_row = Group( attr_key
                                        + Suppress( Optional(",")))))
 attr_map = ZeroOrMore( attr_row + Suppress( Optional('\n')))
 
-# Attributes map is converted to dict when parsing:
+def do_attr_map(item):
+    return dict([[key.strip(), [i.strip() for i in vals]] for key, vals in item])
 
-
-attr_map.setParseAction(lambda x: dict(x.asList()))
+attr_map.setParseAction(do_attr_map)
 
 #### Body part
 
@@ -118,9 +118,8 @@ decorated_exprs = [Forward() for _ in decors_mapping]
 ## URLs cannot be followed by !, if so, should be just cited.
 url = Suppress( White(' \t')) \
     + ( Combine( Literal("http://") + CharsNotIn(' \t\r\n!'))
-        | Combine( Optional("http://") 
-                 + OneOrMore( CharsNotIn(' \t\r\n.') + ".")
-                 + CharsNotIn(' \t\r\n!.\\'))) + ~Literal("!")
+        | Combine( OneOrMore( CharsNotIn(' \t\r\n.') + ".")
+                   + CharsNotIn(' \t\r\n.()[]{};`\':"|,./<>?!@#$%^&*\\' + decor_chars)))
 
 # This is what can be contained in any line of text,
 # undecorated or decorated text.
@@ -131,8 +130,14 @@ inline_atom = ( undecorated_expr
 
 def decorate_with_url(item):
     if len(item) == 2:
+        if item[0] == "~":
+            return item[1]
+        elif item[0] == "!":
+            content = item[1]
+        else:
+            content = item[0]
         return [['<a href="' + reduce(lambda x,y: x + y, item[1]) + '">',
-                 item[0],
+                 content,
                  '</a>']]
 
 inline_atom.setParseAction(decorate_with_url)
