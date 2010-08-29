@@ -72,11 +72,6 @@ attr_map.setParseAction(lambda x: dict(x.asList()))
 
 #### Body part
 
-## Header:
-## Will match to a single line that starts with a continuous sequence 
-header = LineStart() + Word('*') + CharsNotIn('\n') + Suppress( Optional('\n'))
-
-
 ## Decorators:
 ## Bold text, underline, code and so on.
 
@@ -170,6 +165,12 @@ for t in test_exprs:
     pprint(inline_expr.parseString(t).asList())
 
 
+## Header:
+## Will match to a single line that starts with a continuous sequence 
+header = LineStart() + Word('*') + inline_expr + Suppress( Optional('\n'))
+
+do_header = ""
+
 roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + ~( Literal(">")) + inline_expr)
 roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
 
@@ -209,8 +210,8 @@ blockquote = LineStart() + Literal(">>") + Suppress( White('\r\n'))\
 
 pprint(blockquote.parseString(""">>
 
-Gravity can't be held responsible for people
-falling in love.\\
+ASDF
+QWER
 
 /Albert Einstein/
 
@@ -232,6 +233,26 @@ sad
 
 "@@"
 
+code_block = LineStart() + Literal("@@") + Suppress( White('\r\n')) \
+             + OneOrMore( ~Literal("@@") + CharsNotIn('\r\n') + White('\r\n')) \
+             + LineStart() + Literal("@@")
+
+def do_code_block(item):
+    return ["<pre>", item[1:-1], "</pre>"]
+
+code_block.setParseAction(do_code_block)
+
+pprint(code_block.parseString("""@@
+sdf a
+  sdf as   
+  as 
+  as df
+@@
+ asdf
+
+@@
+
+qwer""").asList())
 
 #### Document Layout:
 
@@ -242,7 +263,7 @@ document = title + empty_lines + attr_map  + empty_lines \
       (
         header
         | blockquote
-        # & code_block
+        | code_block
         | embeddable
       ) + empty_lines
     ) 

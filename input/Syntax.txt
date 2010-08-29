@@ -15,7 +15,7 @@ date: 2010-07-18, for now only YYYY-MM-DD format works
 ** asfas
 asdf asfdas f
 
-*** asdfafewa
+*** as /dfafewa/
 
 After another empty line, first paragraph starts. Like everywhere,
 end-of-lines aren't sigficant until ended with two backslashes.\\
@@ -96,7 +96,12 @@ asdf
 | Paragraphs that begins with | will be centered.
 
 * Code and Qutoes
-To be thought.
+
+@@
+   Block that starts and ends
+
+ with a line with @@ only.
+@@
 
 Each line of quote should begin with >, like this:
 
