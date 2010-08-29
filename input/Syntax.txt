@@ -50,7 +50,7 @@ Lines starting with percentage mark (%) are comments. You won't see this:
 - _underlines_ between underscores 
 - *bolds* between asterisks
 - -crosses- between dashes
-- @code()@ between monkeys: 
+- @code()@ between monkeys:
 - first, *bolded, then /emphasised/*
 - /*-asdf-*/ -*/qwer/*-
 - hint: they will only work if there is no space between symbol and a word.
@@ -68,10 +68,10 @@ Tests:
 - ! http://pstryk.net/~santamon sdfs  sadf
 - /UIOP/ http://ps-tr@yk.net/~sant@amon sdfwefw
 - ASDF Syntax.html wefwe
-- [qwer uiop] Syntax.html
+- &qwer uiop& Syntax.html
 - @tyuio ghjk tyui@ archive.html
 - sd fas Syntax.html! wefwe
-- [tyu erty erty wert] http://pstryk.net/asdf/asdf/asdf/#123 wefwe
+- &tyu erty erty wert& http://pstryk.net/asdf/asdf/asdf/#123 wefwe
 - QWER http://pstryk.net/~santamon! wfewe we
 - /asdf asdfas/ http://google.com/bsd/a/a_a_a
 
@@ -100,9 +100,12 @@ To be thought.
 
 Each line of quote should begin with >, like this:
 
-> Gravity can't be held responsible for people
-> falling in love.\\
-> /Albert Einstein/
+
+>>
+Gravity can't be held responsible for people
+falling in love.\\
+/Albert Einstein/
+<<
 
 * My Beautiful English
 To be learned.

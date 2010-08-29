@@ -46,6 +46,9 @@ input_text = open(options['-i']).read()
 # to space + tab. (default value is " \t\n\r")
 ParserElement.setDefaultWhitespaceChars(' \t')
 
+
+empty_lines = Suppress( Optional( White('\n')))
+
 #### Head part
 
 ## Title:
@@ -88,6 +91,9 @@ decors_mapping = {'/': 'em',
 # lets grab all delimiters with one string
 decor_chars = reduce(lambda x,y: x+y, decors_mapping.keys())
 
+# interleaving characters with spaces for use in oneOf()
+decor_chars_with_spaces = reduce(lambda x,y: x + " " + y, decor_chars)
+
 # TODO: I REALLY need to work on this one, because it have to define
 # what's on inside and outside of any of decorated_exprs
 undecorated_expr = Combine( CharsNotIn(decor_chars + ' \t\r\n')
@@ -95,6 +101,13 @@ undecorated_expr = Combine( CharsNotIn(decor_chars + ' \t\r\n')
                                           + CharsNotIn(decor_chars + ' \t\r\n')))
                                         
 # ' \t\r\n' its "Space Train" for remembering ;) 2010-08-25, 20:06 CEST
+
+#fallback_match = oneOf(decor_chars_with_spaces)
+#fallback_expr = fallback_match + ~( CharsNotIn( decor_chars + '\r\n') + matchPreviousExpr(fallback_match))
+
+fallback_exprs = [Group( Literal(char) * 2
+                         | (Literal(char) + CharsNotIn(decor_chars + " \t\r\n")))
+                  for char in decor_chars]
 
 
 # Decorated text can be recursive so we need to use Forward()
@@ -107,15 +120,25 @@ decorated_exprs = [Forward() for _ in decors_mapping]
 ## second one for matching local files such as asdf.png or qwer/asdf.png .
 ## URLs cannot be followed by !, if so, should be just cited.
 url = Suppress( White(' \t')) \
-    + ( Group(Literal("http://") + CharsNotIn(' \t\r\n'))
-        | Group( Optional("http://") 
+    + ( Combine( Literal("http://") + CharsNotIn(' \t\r\n!'))
+        | Combine( Optional("http://") 
                  + OneOrMore( CharsNotIn(' \t\r\n.') + ".")
-                 + CharsNotIn(' \t\r\n!.') + ~Literal("!")))
+                 + CharsNotIn(' \t\r\n!.\\'))) + ~Literal("!")
 
 # This is what can be contained in any line of text,
 # undecorated or decorated text.
-inline_atom = ( undecorated_expr | reduce(lambda x,y: x | y, decorated_exprs)) \
+inline_atom = ( undecorated_expr
+                | reduce(lambda x,y: x | y, decorated_exprs)
+                | reduce(lambda x,y: x | y, fallback_exprs)) \
               + Optional(url)
+
+def decorate_with_url(item):
+    if len(item) == 2:
+        return [['<a href="' + reduce(lambda x,y: x + y, item[1]) + '">',
+                 item[0],
+                 '</a>']]
+
+inline_atom.setParseAction(decorate_with_url)
 
 inline_expr = OneOrMore(inline_atom + Optional(White(' \t')))
 
@@ -124,25 +147,93 @@ inline_expr = OneOrMore(inline_atom + Optional(White(' \t')))
 # Note that inline_expr is recursively refering to all of 
 # decorated_expr's.
 
+def decorate(item):
+    tag = decors_mapping[item.asList()[0]]
+    if tag ==  None:
+        return [item.asList()[1:-1]]
+    else:
+        return [["<%s>" % tag] + item.asList()[1:-1] + ["</%s>" % tag]]
+
 for index, char in enumerate(decor_chars):
-    decorated_exprs[index] << Group(char + inline_expr + char)
+    decorated_exprs[index] << char + inline_expr + char
+    decorated_exprs[index].setParseAction(decorate)
 
 #pprint(inline_expr.parseString("* s/*d* - [ ]-/f- add as/df.com -sf *").asList())
-expr = "w@er as*d*f.asdf uip http://asdfwefw/sadfsa/ -*/ a q/w.er /*-"
-expr = "@@"
-pprint(inline_expr.parseString(expr).asList())
+test_exprs = ["w@er as*d*f.asdf uip http://asdfwefw/sadfsa/ -*/ a q/w.er /*-",
+              "&asdf @@ asdf&",
+              "@asdf",
+              "@http://@"#,
+              #"@_@",
+              #"@@@"
+              ]
+for t in test_exprs:
+    pprint(inline_expr.parseString(t).asList())
 
 
-roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + inline_expr)
+roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + ~( Literal(">")) + inline_expr)
 roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
 
-paragraph = Optional( oneOf("=> <= -> |")) \
-    + OneOrMore( inline_expr + Suppress( Optional('\n')))
+
+
+paragraph_classes = {'=>': 'makeblog_box makeblog_box_right',
+                     '<=': 'makeblog_box makeblog_box_left',
+                     '->': 'makeblog_right',
+                     '|' : 'makeblog_center'}
+
+paragraph_decors = reduce(lambda x,y: x + " " + y, paragraph_classes)
+
+paragraph = ~(oneOf(">> << @@")) + Optional( oneOf("=> <= -> |")) \
+    + OneOrMore(~(oneOf(">> << @@")) + inline_expr + Optional('\n'))
+
+def do_paragraph(item):
+    first_elem = item.asList()[0]
+    if type(first_elem) == str:
+        pclass = paragraph_classes.get(first_elem)
+    else:
+        pclass =  None
+    if pclass:
+        return ['<p class="%s">' % pclass, item.asList()[1:], '</p>']
+    else:
+        return ['<p>', item.asList(), '</p>']
+
+paragraph.setParseAction(do_paragraph)
+
+### Blockquote:
+
+embeddable = Group(paragraph
+                   | roll_block)
+
+blockquote = LineStart() + Literal(">>") + Suppress( White('\r\n'))\
+             + ZeroOrMore(embeddable + empty_lines) \
+             + Literal("<<")
+
+pprint(blockquote.parseString(""">>
+
+Gravity can't be held responsible for people
+falling in love.\\
+
+/Albert Einstein/
+
+=> efwe
+
+- asdf
+  # sadf
+- werwe
+<<
+
+>>
+asdf
+asdf
+sad
+<<""").asList())
+
+### Code:
+"@@"
+
+"@@"
 
 
 #### Document Layout:
-
-empty_lines = Suppress( Optional( White('\n')))
 
 document = title + empty_lines + attr_map  + empty_lines \
     + ZeroOrMore \
@@ -150,12 +241,9 @@ document = title + empty_lines + attr_map  + empty_lines \
       Group
       (
         header
-        # & blockquote
+        | blockquote
         # & code_block
-        | roll_block
-        # unordered_list
-        # & ordered_list
-        | paragraph
+        | embeddable
       ) + empty_lines
     ) 
 
