@@ -143,11 +143,11 @@ inline_expr = OneOrMore(inline_atom + Optional(White(' \t')))
 # decorated_expr's.
 
 def decorate(item):
-    tag = decors_mapping[item.asList()[0]]
+    tag = decors_mapping[item[0]]
     if tag ==  None:
-        return [item.asList()[1:-1]]
+        return [item[1:-1]]
     else:
-        return [["<%s>" % tag] + item.asList()[1:-1] + ["</%s>" % tag]]
+        return [["<%s>" % tag] + item[1:-1] + ["</%s>" % tag]]
 
 for index, char in enumerate(decor_chars):
     decorated_exprs[index] << char + inline_expr + char
@@ -175,11 +175,50 @@ def do_header(item):
 
 header.setParseAction(do_header)
 
+roll_stack = [1]
+
+
+unordered_list = Forward()
+ordered_list = Forward()
+
+any_list = unordered_list ^ ordered_list
+
+unordered_elem = "-" + Group(inline_expr) + Optional(any_list)
+ordered_elem = "#" + Group(inline_expr) + Optional(any_list)
+
+def do_list_elem(item):
+    
+#roll_elem = ordered_elem | unordered_elem
+
+unordered_list << indentedBlock(unordered_elem, roll_stack, True)
+ordered_list << indentedBlock(ordered_elem, roll_stack, True)
+
+ordered_list_first_level = indentedBlock(ordered_elem, roll_stack, False)
+unordered_list_first_level = indentedBlock(unordered_elem, roll_stack, False)
+
+roll_block = OneOrMore(ordered_list_first_level | unordered_list_first_level )
+
+pprint(roll_block.parseString("""- asdf
+- -qwer-
+  # uiop asdfas
+- werew sadf a
+ - bnm asdfa
+ -ghjkl
+   -456789
+     -789
+# asdf
+""").asList())
+
+### old rolls:
 roll_elem = Group( Optional( White(' \t')) + oneOf("- #") + ~( Literal(">")) + inline_expr)
 roll_block = OneOrMore( roll_elem + Suppress( Optional('\n')))
 
+def do_roll(item):
+    tag_stack = []
+    for line in item:
+        pass
 
-
+# Bandwidth-saving maniacs will kill me for this makeblog_ prefixes :P
 paragraph_classes = {'=>': 'makeblog_box makeblog_box_right',
                      '<=': 'makeblog_box makeblog_box_left',
                      '->': 'makeblog_right',
@@ -191,13 +230,13 @@ paragraph = ~(oneOf(">> << @@")) + Optional( oneOf("=> <= -> |")) \
     + OneOrMore(~(oneOf(">> << @@")) + inline_expr + Optional('\n'))
 
 def do_paragraph(item):
-    first_elem = item.asList()[0]
+    first_elem = item[0]
     if type(first_elem) == str:
         pclass = paragraph_classes.get(first_elem)
     else:
         pclass =  None
     if pclass:
-        return ['<p class="%s">' % pclass, item.asList()[1:], '</p>']
+        return ['<p class="%s">' % pclass, item[1:], '</p>']
     else:
         return ['<p>', item.asList(), '</p>']
 
@@ -205,12 +244,16 @@ paragraph.setParseAction(do_paragraph)
 
 ### Blockquote:
 
-embeddable = Group(paragraph
-                   | roll_block)
+embeddable = Group(paragraph | roll_block)
 
 blockquote = LineStart() + Literal(">>") + Suppress( White('\r\n'))\
              + ZeroOrMore(embeddable + empty_lines) \
              + Literal("<<")
+
+def do_blockquote(item):
+    return ["<blockquote>", item[1:-1], "</blockquote>"]
+
+blockquote.setParseAction(do_blockquote)
 
 pprint(blockquote.parseString(""">>
 
@@ -273,5 +316,5 @@ document = title + empty_lines + attr_map  + empty_lines \
     ) 
 
 #print document.verify()
-sadf = document.parseString(input_text)
-pprint(sadf.asList())
+#sadf = document.parseString(input_text)
+#pprint(sadf.asList())

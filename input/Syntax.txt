@@ -103,7 +103,7 @@ asdf
  with a line with @@ only.
 @@
 
-Each line of quote should begin with >, like this:
+Blockquotes starts on line with << and ends with >>.
 
 
 >>
