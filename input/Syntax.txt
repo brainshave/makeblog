@@ -19,8 +19,7 @@ asdf asfdas f
 
 After another empty line, first paragraph starts. Like everywhere,
 end-of-lines aren't sigficant until ended with two backslashes.\\
-Generally, paragraphs are divided by empty lines. Revealing, huh.
-wer asdf.com
+Generally, paragraphs are divided by empty \@ -- \ asdf\asdf lines. Revealing, huh. \\a\b\\b\\c 13--123 asdfas
 
 * Sections titles are marked by asterisks. (Stealed from org-mode)
 One star means h2 tag because h1 is reserved for article title.

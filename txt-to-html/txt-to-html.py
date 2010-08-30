@@ -81,7 +81,7 @@ attr_map.setParseAction(do_attr_map)
 decors_mapping = {'/': 'em',
                   '_': 'u',
                   '*': 'strong',
-                  #'-': 'del',
+                  '-': 'del',
                   '@': 'code',
                   '&': None}
 
@@ -91,11 +91,28 @@ decor_chars = reduce(lambda x,y: x+y, decors_mapping.keys())
 # interleaving characters with spaces for use in oneOf()
 decor_chars_with_spaces = reduce(lambda x,y: x + " " + y, decor_chars)
 
-# TODO: I REALLY need to work on this one, because it have to define
-# what's on inside and outside of any of decorated_exprs
-undecorated_expr = Combine( CharsNotIn(decor_chars + ' \t\r\n')
-                            + ZeroOrMore( Word(decor_chars)
-                                          + CharsNotIn(decor_chars + ' \t\r\n')))
+line_break = Literal('\\\\')
+line_break.setParseAction(lambda: "<br />")
+
+escaped_char = Combine('\\' + Word(decor_chars + "~!", exact=1))
+escaped_char.setParseAction(lambda x: x[0][1])
+
+backslash = Literal('\\')
+
+pause = Literal('--')
+pause.setParseAction(lambda: "&mdash;")
+
+interpunction_chars = ",.;'[]`!$%^()_+={}:\"|<>?"
+interpunction = Word(interpunction_chars)
+
+# what's on inside and outside of any of decorated_exprs:
+undecorated_expr = Combine( line_break | escaped_char | backslash | pause
+                            | interpunction
+                            | (CharsNotIn(decor_chars + ' \t\r\n\\' + interpunction_chars)
+                               + ZeroOrMore( Word(decor_chars)
+                                             + CharsNotIn(decor_chars
+                                                          + ' \t\r\n\\'
+                                                          + interpunction_chars))))
                                         
 # ' \t\r\n' its "Space Train" for remembering ;) 2010-08-25, 20:06 CEST
 
@@ -103,7 +120,7 @@ undecorated_expr = Combine( CharsNotIn(decor_chars + ' \t\r\n')
 #fallback_expr = fallback_match + ~( CharsNotIn( decor_chars + '\r\n') + matchPreviousExpr(fallback_match))
 
 fallback_exprs = [Group( Literal(char) * 2
-                         | (Literal(char) + CharsNotIn(decor_chars + " \t\r\n")))
+                         | (Literal(char) + CharsNotIn(decor_chars + " \t\r\n") + interpunction_chars))
                   for char in decor_chars]
 
 
