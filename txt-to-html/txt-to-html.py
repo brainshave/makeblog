@@ -102,7 +102,7 @@ backslash = Literal('\\')
 pause = Literal('--')
 pause.setParseAction(lambda: "&mdash;")
 
-interpunction_chars = ",.;'[]`!$%^()_+={}:\"|<>?"
+interpunction_chars = ",.;'[]`!$%^()+={}:\"|<>?"
 interpunction = Word(interpunction_chars)
 
 # what's on inside and outside of any of decorated_exprs:
@@ -134,9 +134,11 @@ decorated_exprs = [Forward() for _ in decors_mapping]
 ## second one for matching local files such as asdf.png or qwer/asdf.png .
 ## URLs cannot be followed by !, if so, should be just cited.
 url = Suppress( White(' \t')) \
-    + ( Combine( Literal("http://") + CharsNotIn(' \t\r\n!'))
+    + ( Combine( Literal("http://")
+                 + OneOrMore( Optional( Word(interpunction_chars))
+                              + CharsNotIn(' \t\r\n' + interpunction_chars)))
         | Combine( OneOrMore( CharsNotIn(' \t\r\n.') + ".")
-                   + CharsNotIn(' \t\r\n.()[]{};`\':"|,./<>?!@#$%^&*\\' + decor_chars)))
+                   + CharsNotIn(' \t\r\n\\\\' + decor_chars + interpunction_chars)))
 
 # This is what can be contained in any line of text,
 # undecorated or decorated text.

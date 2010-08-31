@@ -90,7 +90,7 @@ with auto width.
 
 <= Analogical to =>.
 
--> Paragraphs that begins with -> will be right-aligned. -> adsf ->
+-> Paragraphs that begins with --> will be right-aligned. \-> adsf \->
 asdf
 
 | Paragraphs that begins with | will be centered.
