@@ -7,7 +7,7 @@
 # This part:
 # TXT to HTML converter with nice org-mode-like syntax
 
-import sys, re, getopt, os, locale
+import sys, re, getopt, os, locale, cgi
 from datetime import datetime
 from string import Template
 from pyparsing import *
@@ -37,6 +37,21 @@ template = Template(open(options.get('-t', "templates/article.html")).read())
 
 # read file and split into list of paragraphs
 input_text = open(options['-i']).read()
+
+
+def merge_lists(root):
+    ret = ""
+    for item in root:
+        t = type(item)
+        if t == str:
+            ret += item
+        elif t == list:
+            ret += merge_lists(item)
+        elif item == None:
+            pass
+        else:
+            ret += merge_lists(item.asList())
+    return ret
 
 
 #test cases: empty file, one-line file, 
@@ -260,16 +275,13 @@ def do_blockquote(item):
 blockquote.setParseAction(do_blockquote)
 
 ### Code:
-"@@"
-
-"@@"
-
 code_block = LineStart() + Literal("@@") + Suppress( White('\r\n')) \
              + OneOrMore( ~Literal("@@") + CharsNotIn('\r\n') + White('\r\n')) \
              + LineStart() + Literal("@@")
 
 def do_code_block(item):
-    return ["<pre>", item[1:-1], "</pre>"]
+    code = cgi.escape(merge_lists(item[1:-1]))
+    return ["<pre>", code, "</pre>"]
 
 code_block.setParseAction(do_code_block)
 
@@ -291,20 +303,6 @@ document = title + empty_lines + attr_map  + empty_lines \
 #print document.verify()
 parsed_tree = document.parseString(input_text, True)
 #pprint(parsed_tree.asList())
-
-def merge_lists(root):
-    ret = ""
-    for item in root:
-        t = type(item)
-        if t == str:
-            ret += item
-        elif t == list:
-            ret += merge_lists(item)
-        elif item == None:
-            pass
-        else:
-            ret += merge_lists(item.asList())
-    return ret
 
 body_offset = 0
 #title = ""
