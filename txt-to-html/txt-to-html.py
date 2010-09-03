@@ -149,12 +149,13 @@ decorated_exprs = [Forward() for _ in decors_mapping]
 ## second one for matching local files such as asdf.png or qwer/asdf.png .
 ## URLs cannot be followed by !, if so, should be just cited.
 url = Suppress( White(' \t')) \
-    + ( Combine( Literal("http://")
-                 + OneOrMore( Optional( Word(interpunction_chars))
-                              + CharsNotIn(' \t\r\n' + interpunction_chars)))
-        | Combine( OneOrMore( CharsNotIn(' \t\r\n.') + ".")
-                   + CharsNotIn(' \t\r\n\\\\' + decor_chars + interpunction_chars)))
-
+    + Combine( ( Word(alphanums) + "://"
+                 #+ OneOrMore( CharsNotIn(' \t\r\n/.') + Optional('.') + FollowedBy(Word(alphanums))) + Word(alphanums) # domain
+                 + OneOrMore( CharsNotIn(" \t\r\n" + interpunction_chars+decor_chars)
+                              | (Word(interpunction_chars+decor_chars) + ~ (White() | LineEnd()))
+                              | "/"))
+               | (OneOrMore( CharsNotIn(' \t\r\n.') + "." + ~(White() | LineEnd())) + Word(alphanums)))
+    
 # This is what can be contained in any line of text,
 # undecorated or decorated text.
 inline_atom = ( undecorated_expr
