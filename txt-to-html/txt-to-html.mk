@@ -17,4 +17,4 @@ $(HTML_TARGETS) : $(TEMPLATES_DIR)/article.html $(MAKEBLOG_PATH)/txt-to-html/txt
 $(TMPDIR)/%.html-cache : $(OUTDIR)/%.html
 
 $(OUTDIR)/%.html : $(INDIR)/%.txt
-	python $(MAKEBLOG_PATH)/txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(INDIR)/%.txt,$(TMPDIR)/%.html-cache,$<)
+	python $(MAKEBLOG_PATH)/txt-to-html/txt-to-html.py -i $< -o $@ -c $(patsubst $(INDIR)/%.txt,$(TMPDIR)/%.html-cache,$<) -d $(patsubst $(INDIR)/%.txt,$(TMPDIR)/%.html-dump,$<)

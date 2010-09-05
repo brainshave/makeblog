@@ -21,9 +21,11 @@ Fields used for now are:
   - title: title for link
 
 Options:
-  -o output file
+  -o output file for archive
+  -i output file for index
   -l output name to the latest entry
-  -t template to use
+  -t template to use for archive
+  -m template to use for index
 
 Rest of parameters are cache files to parse.
 """
@@ -36,13 +38,14 @@ header_format = '<h2 class="archive_month">%B %Y</h2>'
 ## load locale defaults from OS:
 locale.setlocale(locale.LC_ALL, '')
 
-opts, filenames = getopt.gnu_getopt(sys.argv[1:], 'o:t:l:h')
+opts, filenames = getopt.gnu_getopt(sys.argv[1:], 'o:t:l:m:i:h')
 options = dict(opts)
 
 output_file = options['-o']
+output_index_file = options['-i']
 
 template = Template(open(options.get('-t', "templates/article.html")).read())
-
+template_index = Template(open(options.get('-m', "templates/article.html")).read())
 # print output_file
 #m = re.compile(r'(.*\/+)[^/]*').match(output_file)
 
@@ -69,7 +72,6 @@ if m:
 else:
     outdir = ""
 
-### print outdir
 
 for item in metadata:
     curr_day = item['date']
@@ -86,9 +88,9 @@ for item in metadata:
          'day': curr_day.day}
         
 
-#item['date'].strftime('%d')
-
 body += '</ul>'
+
+## Writing archive
 substitutions = {'title': os.environ['BLOG_ARCHIVE_TITLE'],
                  'body': body,
                  'date': '', #datetime.datetime.now().strftime(os.environ['BLOG_DATE_FORMAT']),
@@ -97,3 +99,13 @@ substitutions = {'title': os.environ['BLOG_ARCHIVE_TITLE'],
                  'blog_email': os.environ['BLOG_EMAIL'],
                  'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE']}
 open(options['-o'], 'w').write(template.safe_substitute(substitutions))
+
+## Writing index
+latest = metadata[0]
+latest_content = open(latest['dumpfile']).read()
+
+substitutions.update({'title': latest['title'],
+                      'body': latest_content,
+                      'date': latest['date'].strftime(os.environ['BLOG_DATE_FORMAT'])})
+
+open(options['-i'], 'w').write(template_index.safe_substitute(substitutions))

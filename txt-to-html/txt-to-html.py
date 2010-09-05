@@ -23,10 +23,11 @@ def print_help():
     -i path     - input file
     -o path     - output file
     -c path     - cache file (attributes will go there)
+    -d path     - dump file (content will be dumped there)
 """
     exit(1)
 
-opts, _ = getopt.gnu_getopt(sys.argv[1:], 't:i:o:c:h')
+opts, _ = getopt.gnu_getopt(sys.argv[1:], 't:i:o:c:d:h')
 options = dict(opts)
 
 if '-h' in options.keys():
@@ -320,6 +321,7 @@ if len(parsed_tree) > 1:
 attributes['title'] = title
 attributes['input'] = options['-i']
 attributes['output'] = options['-o']
+attributes['dumpfile'] = options.get('-d')
 
 if 'date' in attributes:
     attributes['date'] = datetime.strptime(attributes['date'][0], '%Y-%m-%d')
@@ -332,6 +334,10 @@ if options.get('-c'):
     open(options['-c'], 'w').write(str(attributes))
     
 body_text = merge_lists(parsed_tree[body_offset:])
+
+## Dump body text to file given with -d option:
+if options.get('-d'):
+    open(options['-d'], 'w').write(body_text)
 
 substitutions = {'title': title,
                  'body': body_text,
