@@ -345,6 +345,7 @@ substitutions = {'title': title,
                  'blog_title': os.environ['BLOG_TITLE'],
                  'blog_author': os.environ['BLOG_AUTHOR'],
                  'blog_email': os.environ['BLOG_EMAIL'],
-                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE']}
+                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE'],
+                 'blog_url': os.environ['BLOG_URL']}
 
 open(options['-o'], 'w').write(template.safe_substitute(substitutions))

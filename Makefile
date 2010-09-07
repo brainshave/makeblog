@@ -10,6 +10,7 @@
 BLOG_AUTHOR = Anonymous Coward
 BLOG_EMAIL = me@inter.net
 BLOG_TITLE = Makeblog-Made Blog
+BLOG_URL = http://someblog.com
 BLOG_ARCHIVE_TITLE = Archives
 BLOG_DATE_FORMAT = %Y-%m-%d %A
 MAKEBLOG_PATH = .
@@ -37,6 +38,7 @@ INDEX_TEMPLATE = $(TEMPLATES_DIR)/article.html
 export BLOG_AUTHOR
 export BLOG_EMAIL
 export BLOG_TITLE
+export BLOG_URL
 export BLOG_ARCHIVE_TITLE
 export BLOG_DATE_FORMAT
 export MAKEBLOG_PATH

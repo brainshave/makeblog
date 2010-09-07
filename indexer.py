@@ -8,7 +8,7 @@
 # General indexer
 # rest of arguments are filenames
 
-import sys, os, getopt, datetime, locale, re
+import sys, os, getopt, datetime, locale, re, cgi
 from string import Template
 
 def print_help():
@@ -26,6 +26,7 @@ Options:
   -l output name to the latest entry
   -t template to use for archive
   -m template to use for index
+  -a atom output
 
 Rest of parameters are cache files to parse.
 """
@@ -38,7 +39,7 @@ header_format = '<h2 class="archive_month">%B %Y</h2>'
 ## load locale defaults from OS:
 locale.setlocale(locale.LC_ALL, '')
 
-opts, filenames = getopt.gnu_getopt(sys.argv[1:], 'o:t:l:m:i:h')
+opts, filenames = getopt.gnu_getopt(sys.argv[1:], 'o:t:l:m:i:a:h')
 options = dict(opts)
 
 output_file = options['-o']
@@ -97,7 +98,8 @@ substitutions = {'title': os.environ['BLOG_ARCHIVE_TITLE'],
                  'blog_title': os.environ['BLOG_TITLE'],
                  'blog_author': os.environ['BLOG_AUTHOR'],
                  'blog_email': os.environ['BLOG_EMAIL'],
-                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE']}
+                 'blog_archive_title': os.environ['BLOG_ARCHIVE_TITLE'],
+                 'blog_url': os.environ['BLOG_URL']}
 open(options['-o'], 'w').write(template.safe_substitute(substitutions))
 
 ## Writing index
@@ -109,3 +111,39 @@ substitutions.update({'title': latest['title'],
                       'date': latest['date'].strftime(os.environ['BLOG_DATE_FORMAT'])})
 
 open(options['-i'], 'w').write(template_index.safe_substitute(substitutions))
+
+
+atom_template = Template("""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>$blog_title</title> 
+  <link href="$blog_url" rel="self" />
+  <updated>$updated</updated>
+  <author> 
+    <name>$blog_author</name>
+  </author>
+  <id>$blog_url/$atom_output</id>
+  $entries
+</feed>
+""")
+
+entry_template = Template("""
+  <entry>
+    <title>$title</title>
+    <link href="$blog_url/$output" rel="alternate" />
+    <id>$blog_url/$output</id>
+    <updated>$updated</updated>
+    <published>$published</published>
+    <content type="html">$body</content>
+  </entry>
+""")
+#2003-12-13T08:29:29-04:00
+atom_date_format = "%Y-%m-%dT%T%z"
+
+def make_entry(meta):
+    entry_body = cgi.escape(open(meta['dumpfile']))
+    substitutions.update({'title': meta['title'],
+                          'body': entry_body,
+                          'published': meta['date'].strftime(),
+                          'updated': "TODO" })
+    entry = entry_template
+
