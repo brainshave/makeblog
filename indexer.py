@@ -10,6 +10,7 @@
 
 import sys, os, getopt, datetime, locale, re, cgi
 from string import Template
+from pprint import pprint
 
 def print_help():
     print """Cache file indexer.
@@ -113,6 +114,32 @@ substitutions.update({'title': latest['title'],
 open(options['-i'], 'w').write(template_index.safe_substitute(substitutions))
 
 
+entry_template = Template("""
+  <entry>
+    <title>$title</title>
+    <link href="$blog_url/$output" rel="alternate" />
+    <id>$blog_url/$output</id>
+    <updated>$updated</updated>
+    <published>$published</published>
+    <content type="html">$body</content>
+  </entry>
+""")
+#2003-12-13T08:29:29-04:00
+atom_date_format = "%Y-%m-%dT%H:%M:%SZ"
+
+def make_entry(meta):
+    entry_body = cgi.escape(open(meta['dumpfile']).read())
+    entry_subs = {'title': meta['title'],
+                  'output': meta['output'],
+                  'body': entry_body,
+                  'published': meta['date'].strftime(atom_date_format),
+                  'updated': meta['updated'].strftime(atom_date_format),
+                  'blog_url': os.environ['BLOG_URL']}
+    entry = entry_template.substitute(entry_subs)
+    return entry
+    
+#pprint(map(make_entry, metadata[:10]))
+
 atom_template = Template("""<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>$blog_title</title> 
@@ -126,24 +153,14 @@ atom_template = Template("""<?xml version="1.0" encoding="utf-8"?>
 </feed>
 """)
 
-entry_template = Template("""
-  <entry>
-    <title>$title</title>
-    <link href="$blog_url/$output" rel="alternate" />
-    <id>$blog_url/$output</id>
-    <updated>$updated</updated>
-    <published>$published</published>
-    <content type="html">$body</content>
-  </entry>
-""")
-#2003-12-13T08:29:29-04:00
-atom_date_format = "%Y-%m-%dT%T%z"
+atom_output = options['-a']
 
-def make_entry(meta):
-    entry_body = cgi.escape(open(meta['dumpfile']))
-    substitutions.update({'title': meta['title'],
-                          'body': entry_body,
-                          'published': meta['date'].strftime(),
-                          'updated': "TODO" })
-    entry = entry_template
-
+atom_entries = reduce(lambda x,y: str(x) + str(y),
+                      map(make_entry, metadata[:10]))
+atom_subs = {'blog_title': os.environ['BLOG_TITLE'],
+             'blog_author': os.environ['BLOG_AUTHOR'],
+             'blog_url': os.environ['BLOG_URL'],
+             'atom_output': atom_output,
+             'updated': metadata[0]['updated'].strftime(atom_date_format),
+             'entries': atom_entries}
+open(atom_output, "w").write(atom_template.substitute(atom_subs))

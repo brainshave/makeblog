@@ -322,11 +322,12 @@ attributes['title'] = title
 attributes['input'] = options['-i']
 attributes['output'] = options['-o']
 attributes['dumpfile'] = options.get('-d')
+attributes['updated'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
 
 if 'date' in attributes:
     attributes['date'] = datetime.strptime(attributes['date'][0], '%Y-%m-%d')
 else:
-    attributes['date'] = datetime.fromtimestamp(os.stat(options['-i']).st_mtime)
+    attributes['date'] = attributes['updated']
     
 
 ## Dump attributes to file given with -c option:

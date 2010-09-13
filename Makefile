@@ -58,8 +58,8 @@ config :
 
 $(INDEXED_TARGETS) : $(TMPDIR)
 
-$(OUTDIR)/archive.html : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) $(MAKEBLOG_PATH)/indexer.py
-	python $(MAKEBLOG_PATH)/indexer.py $(INDEXED_TARGETS) -o $@ -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest -m $(INDEX_TEMPLATE) -i $(OUTDIR)/index.html 
+$(OUTDIR)/archive.html $(OUTDIR)/index.html $(OUTDIR)/atom.xml : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) $(MAKEBLOG_PATH)/indexer.py
+	python $(MAKEBLOG_PATH)/indexer.py $(INDEXED_TARGETS) -o $(OUTDIR)/archive.html -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest -m $(INDEX_TEMPLATE) -i $(OUTDIR)/index.html -a $(OUTDIR)/atom.xml
 
 #### copying media for templates (imgs, csss, fonts...)
 TEMPLATE_MEDIA = $(patsubst $(TEMPLATES_DIR)/media/%,$(OUTDIR)/media/%,$(wildcard $(TEMPLATES_DIR)/media/*))
