@@ -1,0 +1,12 @@
+TODO
+
+* txt-to-html
+** DONE links
+** DONE paragaphs
+** DONE \\ -> <br />
+** DONE forbid parsing decors in links
+** TODO support for css files in templates
+   (autocopying them to output)
+** TODO style makeblog CSS classes
+** DONE codeblocks
+** TODO document what's done and how to use it
