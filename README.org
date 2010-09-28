@@ -22,12 +22,12 @@
   All three should be available in any Linux distribution. (At least I found 
   them on Ubuntu and Arch Linux.)
   
-* Sample site
+* Sample Site
   It's working! I'm quite happy to use it for my site (it's in Polish):
   [[http://longstandingbug.com]], You can see the bowels here:
   [[http://github.com/santamon/santamon.github.com]].
 
-* Quick start for Hardcores (until there are some installation instructions)
+* Quick Start For Hardcores (Until There Are Some Installation Instructions)
   Grab sources from here, then look at the *Makefile*
   and *config* files from my site. They will give you a clue.
 
