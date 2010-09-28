@@ -39,7 +39,7 @@ template = Template(open(options.get('-t', "templates/article.html")).read())
 # read file and split into list of paragraphs
 input_text = open(options['-i']).read()
 
-
+## A function that merges lists recurseively
 def merge_lists(root):
     ret = ""
     for item in root:
