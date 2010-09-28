@@ -31,5 +31,8 @@
   Grab sources from here, then look at the *Makefile*
   and *config* files from my site. They will give you a clue.
 
-  Then, there is the *Syntax.txt* file in input dir wich explains
+  Then, there is the *Syntax.txt* file in input dir which explains
   the syntax in a messy fasion.
+
+* Copying
+  MIT license, held in the COPYING file.
