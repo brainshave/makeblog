@@ -133,7 +133,7 @@ def make_entry(meta):
                   'output': meta['output'],
                   'body': entry_body,
                   'published': meta['date'].strftime(atom_date_format),
-                  'updated': meta['updated'].strftime(atom_date_format),
+                  'updated': meta['date'].strftime(atom_date_format),
                   'blog_url': os.environ['BLOG_URL']}
     entry = entry_template.substitute(entry_subs)
     return entry
