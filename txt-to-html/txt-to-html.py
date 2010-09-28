@@ -166,12 +166,12 @@ inline_atom = ( undecorated_expr
 
 def decorate_with_url(item):
     if len(item) == 2:
-        if item[0] == "~":
+        if item[0] == "~": # cite url
             return item[1]
-        elif item[0] == "!":
+        elif item[0] == "!": # cite url inside <a> tag
             content = item[1]
         else:
-            content = item[0]
+            content = item[0] # "normal" mode
         return [['<a href="' + reduce(lambda x,y: x + y, item[1]) + '">',
                  content,
                  '</a>']]
