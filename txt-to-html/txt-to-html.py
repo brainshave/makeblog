@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # AUTHOR:  Szymon Witamborski, santamon@gmail.com
 # PROJECT: Makeblog, http://launchpad.net/makeblog
-# LICENSE: MIT, included in file LICENSE
+# LICENSE: MIT, included in file COPYING
 #
 # This part:
 # TXT to HTML converter with nice org-mode-like syntax
