@@ -5,6 +5,9 @@
 # This part:
 # Scale images to desired maximum width
 # requires: ImageMagick
+#
+# Scaling uses gamma correction suggested here:
+# http://www.4p8.com/eric.brasseur/gamma.html#solutions
 
 MINIATURE_WIDTH ?= 600
 MINIATURE_HEIGHT ?= $(MINIATURE_WIDTH)
