@@ -164,17 +164,42 @@ inline_atom = ( undecorated_expr
                 | reduce(lambda x,y: x | y, fallback_exprs)) \
               + Optional(url)
 
+img_re = re.compile(r""" ^(?:  (?P<thumbname>.*) _m   # name followed by _m
+                             | (?P<solename>.*))      # or name without _m
+                          \.(?P<ext>png|PNG|jpg|JPG)$ # followed by extension
+                     """, re.VERBOSE)
+
+def img_code(match, content):
+    url = match.group(0)
+    thumbname = match.group("thumbname")
+    ext = match.group("ext")
+    if thumbname:
+        return [['<a href="', thumbname, '.', ext, '">',
+                 '<img src="', url, '" alt="', content, '" /></a>']]
+    else:
+        return [['<img src="', url, '" alt="', content, '" />']]
+
+normal_url = re.compile(".*")
+
+def normal_url_code(match, content):
+    return [['<a href="', match.group(), '">', content, '</a>']]
+
+url_alts = [[img_re, img_code],
+            [normal_url, normal_url_code]]
+
 def decorate_with_url(item):
     if len(item) == 2:
+        url = reduce(lambda x,y: x + y, item[1])
         if item[0] == "~": # cite url
             return item[1]
         elif item[0] == "!": # cite url inside <a> tag
-            content = item[1]
+            return [['<a href="', url, '">', url, '</a>']]
         else:
             content = item[0] # "normal" mode
-        return [['<a href="' + reduce(lambda x,y: x + y, item[1]) + '">',
-                 content,
-                 '</a>']]
+            for rex, f in url_alts:
+                match = rex.match(url)
+                if match: return f(match, content)
+
 
 inline_atom.setParseAction(decorate_with_url)
 
