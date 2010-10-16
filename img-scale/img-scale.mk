@@ -30,7 +30,7 @@ $(OUTDIR)/%_m.png : $(INDIR)/%.png
 		-gamma 2.2 -depth 8 $@
 
 $(OUTDIR)/%.png : $(INDIR)/%.png
-	cp -a $< $@
+	cp $< $@
 
 #### JPG FILES
 JPG_TARGETS += $(patsubst $(INDIR)/%,$(OUTDIR)/%,$(wildcard $(INDIR)/*.jpg))
