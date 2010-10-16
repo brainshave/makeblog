@@ -47,4 +47,4 @@ $(OUTDIR)/%_m.jpg : $(INDIR)/%.jpg
 		-gamma 2.2 -depth 8 -quality $(JPEG_QUALITY) -sampling-factor 1x1 $@	
 
 $(OUTDIR)/%.jpg : $(INDIR)/%.jpg
-	cp -a $< $@
+	cp $< $@
