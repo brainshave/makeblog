@@ -14,6 +14,7 @@ BLOG_URL = http://someblog.com
 BLOG_ARCHIVE_TITLE = Archives
 BLOG_DATE_FORMAT = %Y-%m-%d %A
 MAKEBLOG_PATH = .
+PYTHON2_COMMAND = python2
 
 blog: blog_main
 
@@ -59,7 +60,7 @@ config :
 $(INDEXED_TARGETS) : $(TMPDIR)
 
 $(OUTDIR)/archive.html $(OUTDIR)/index.html $(OUTDIR)/atom.xml : $(TMPDIR) $(INDEXED_TARGETS) $(ARCHIVE_TEMPLATE) $(INDEX_TEMPLATE) $(MAKEBLOG_PATH)/indexer.py
-	python $(MAKEBLOG_PATH)/indexer.py $(INDEXED_TARGETS) -o $(OUTDIR)/archive.html -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest -m $(INDEX_TEMPLATE) -i $(OUTDIR)/index.html -a $(OUTDIR)/atom.xml
+	$(PYTHON2_COMMAND) $(MAKEBLOG_PATH)/indexer.py $(INDEXED_TARGETS) -o $(OUTDIR)/archive.html -t $(ARCHIVE_TEMPLATE) -l $(TMPDIR)/latest -m $(INDEX_TEMPLATE) -i $(OUTDIR)/index.html -a $(OUTDIR)/atom.xml
 
 #### copying media for templates (imgs, csss, fonts...)
 TEMPLATE_MEDIA = $(patsubst $(TEMPLATES_DIR)/media/%,$(OUTDIR)/media/%,$(wildcard $(TEMPLATES_DIR)/media/*))
