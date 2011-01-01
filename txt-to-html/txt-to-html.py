@@ -36,8 +36,8 @@ if '-h' in options.keys():
 # read page template:
 template = Template(open(options.get('-t', "templates/article.html")).read())
 
-# read file and split into list of paragraphs
-input_text = open(options['-i']).read()
+# read input file 
+input_text = open(options['-i']).read().translate(None, '\r')
 
 ## A function that merges lists recurseively
 def merge_lists(root):
