@@ -105,10 +105,14 @@ open(options['-o'], 'w').write(template.safe_substitute(substitutions))
 
 ## Writing index
 latest = metadata[0]
+print latest
+print os.environ['BLOG_URL']
 latest_content = open(latest['dumpfile']).read()
 
 substitutions.update({'title': latest['title'],
                       'body': latest_content,
+                      'output': latest['output'],
+                      'article_url': os.environ['BLOG_URL'] + "/" + latest['output'],
                       'date': latest['date'].strftime(os.environ['BLOG_DATE_FORMAT'])})
 
 open(options['-i'], 'w').write(template_index.safe_substitute(substitutions))

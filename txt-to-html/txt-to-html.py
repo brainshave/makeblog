@@ -368,6 +368,8 @@ if options.get('-d'):
 substitutions = {'title': title,
                  'body': body_text,
                  'date': attributes['date'].strftime(os.environ['BLOG_DATE_FORMAT']),
+                 'output': attributes['output'],
+                 'article_url': os.environ['BLOG_URL'] + "/" + attributes['output'],
                  'blog_title': os.environ['BLOG_TITLE'],
                  'blog_author': os.environ['BLOG_AUTHOR'],
                  'blog_email': os.environ['BLOG_EMAIL'],
