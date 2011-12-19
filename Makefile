@@ -25,4 +25,4 @@ tmp/%.json : src/%.md
 	node $(MAKEBLOG_PATH)/markdown_to_html.js $< $@ $(patsubst tmp/%.post.json,%.html,$@)
 
 $(INDEX) : $(JSONS)
-	cat $(JSONS) | node $(MAKEBLOG_PATH)/indexer.js tmp > $@
+	node $(MAKEBLOG_PATH)/indexer.js $@ tmp $(JSONS)

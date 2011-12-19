@@ -1,12 +1,17 @@
+var fs = require('fs');
 var mu = require('mu2');
 var makeblog = require('./utils');
 
-makeblog.readAllStdin(function (text) {
-  data = JSON.parse(text);
-  mu.compile(process.argv[2], function (err, obj) {
+var layout = process.argv[2];
+var input = process.argv[3];
+var output = process.argv[4];
+
+
+mu.compile(layout, function (err, obj) {
+  if (err) throw err;
+  fs.readFile(input, 'utf8', function (err, text) {
     if (err) throw err;
-    mu.render(obj, data).on('data', function (chunk) {
-      process.stdout.write(chunk);
-    });
+    data = JSON.parse(text);
+    mu.render(obj, data).pipe(fs.createWriteStream(output, { encoding: 'utf8' }));
   });
 });

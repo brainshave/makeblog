@@ -2,54 +2,70 @@
 
 var makeblog = require('./utils');
 var fs = require('fs');
-var escape = require('querystring').escape;
 
-makeblog.readAllStdin(function(text) {
-  var posts = text.split('\n').
-    filter(function (line) {
-      // Get rid of empty lines.
-      return line;
-    }).
-    map(function (line) {
-      return JSON.parse(line);
-    }).
+var main_index = process.argv[2];
+var tmpdir = process.argv[3];
+
+var inputs = process.argv.slice(4);
+
+var jsons = [];
+
+var throwErr = function (err) { if (err) throw err; }
+
+var genAll = function () {
+  var posts = jsons.
     filter(function (val) {
       // Only documents with date are considered posts.
       return val && val.date;
     }).
     sort(function (a, b) {
-      return a.date === b.date ? 0
-        : a.date < b.date ? 1 : -1;
+      return a.date.str === b.date.str ? 0
+        : a.date.str < b.date.str ? 1 : -1;
     });
 
   var tags = {};
-  posts.forEach(function (post, i) {
+  posts.forEach(function (post) {
     post.tags && post.tags.forEach(function (tag) {
-      if (!tags[tag]) { tags[tag] = []; }
-      tags[tag].push(post);
+      if (!tags[tag.name]) { tags[tag.name] = []; }
+      tags[tag.name].push(post);
     });
   });
 
-  var tag_list = [];
+  var all_tags = [];
   for (var tag in tags) {
     if (tags.hasOwnProperty(tag)) {
-      var filename = makeblog.tagFileNameBase(tag);
-      tag_list.push({ name: tag, html: filename + '.html', xml: filename + '.xml'});
+      all_tags.push(makeblog.tagDescription(tag, tags[tag].length));
     }
   }
+  all_tags.sort(function (tagDesc1, tagDesc2) {
+    return tagDesc1.count == tagDesc2.count ? 0
+      : tagDesc1.count < tagDesc2.count  ? 1 : -1;
+  });
   
-  process.stdout.write(JSON.stringify({ posts: posts, date: posts[0].date, tags: tag_list }));
+  fs.writeFile(
+    main_index,
+    JSON.stringify(makeblog.indexStruct(undefined, posts, all_tags)),
+    throwErr
+  );
 
-  // First argument tells where to put indexes for tags (optional).
-  if (process.argv.length > 2) {
-    var tmpdir = process.argv[2];
-
-    for (var tag in tags) {
-      if (tags.hasOwnProperty(tag)) {
-        fs.writeFile(tmpdir + '/' + escape(tag) + '.index.json', JSON.stringify({ title: 'Tag: ' + tag, date: tags[tag][0].date, posts: tags[tag], tags: tag_list }), function (err) {
-          if (err) throw err;
-        });
-      }
+  for (var tag in tags) {
+    if (tags.hasOwnProperty(tag)) {
+      fs.writeFile(
+        tmpdir + '/' + makeblog.tagFileNameBase(tag) + '.json',
+        JSON.stringify(makeblog.indexStruct('Tag: ' + tag, tags[tag], all_tags)),
+        throwErr
+      );
     }
   }
+};
+
+var push = function (err, text) {
+  if (err) throw err;
+  jsons.push(JSON.parse(text));
+  if (jsons.length == inputs.length) genAll();
+}
+
+
+inputs.forEach(function (path) {
+  fs.readFile(path, 'utf8', push);
 });
