@@ -1,4 +1,8 @@
-
+# Applies mustache templates. Generates html file for every
+# *.post.json and xml and html file for *.index.json.
+# 
+# For now, templates are hardcoded. In future versions this should be
+# automated based on contents of layout directory.
 
 MUSTACHES := index.html atom.xml 
 MUSTACHES += $(patsubst tmp/%.post.json,%.html,$(wildcard tmp/*.post.json))
@@ -9,9 +13,6 @@ MUSTACHES += $(patsubst tmp/%.json,%.xml,$(wildcard tmp/*.index.json))
 .PHONY: mustaches clean
 
 mustaches: $(MUSTACHES)
-
-echo:
-	@echo $(MUSTACHES)
 
 clean:
 	rm -rf $(MUSTACHES)

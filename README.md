@@ -1,6 +1,6 @@
-# Makeblog, Rebuilt
+# Makeblog, Remade
 
-This is (new/will be) version of Makeblog. Some assumptions:
+This is new version of Makeblog. Some assumptions:
 
 - Abandon own parser and use existing Markdown parser.
 - Reuse, reuse, reuse! (components, programs, Unix commands, etc.)
