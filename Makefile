@@ -54,4 +54,4 @@ tmp/%.json : src/%.md
 # already generated. Thanks to that running make with -j (jobs)
 # parameter is safe.
 $(INDEX) : $(JSONS)
-	node $(MAKEBLOG_PATH)/indexer.js $@ tmp $(JSONS)
+	node $(MAKEBLOG_PATH)/indexer.js $@ tmp $?
