@@ -16,7 +16,7 @@ Features:
 Here is how it works:
 
 1. `src/*.md` files are parsed to `tmp/*.json` files (HTML with some metadata).
-2. `tmp/*.index.json` files are generated for main list and each tag.
+2. `tmp/*.index.json` files are generated for main list and each tag (only files with `date` metadata are considered posts).
 3. `tmp/*.<layout-name>.json` files are parsed using layouts from `layouts` directory to files in main site's directory with suffixes dependent on suffix in layouts name. If layouts have versions with different suffixes, Each input file will be generated in both versions.
 
 Illustrated:
@@ -107,6 +107,6 @@ Illustrated:
   - **basename** - basename of file (whithout extension)
   - **count** - number of posts tagged by this tag
 
-# COPYING & Disclaimer
+# Copywrong
 
-Copywrong 2010-2012 Szymon Witamborski, MIT License.
+Copywrong 2010-2012 Szymon Witamborski, MIT License (see COPYING file).

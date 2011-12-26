@@ -1,7 +1,7 @@
 var escape = require('querystring').escape;
 
 exports.tagFileNameBase = function(tag) {
-  return tag.replace(' ', '_') + '.index';
+  return tag.replace(' ', '_');
 };
 
 exports.tagDescription = function (tag, count) {

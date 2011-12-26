@@ -25,8 +25,6 @@ var genAll = function () {
       return aggregate;
     }, {});
 
-    console.log(new_posts_paths);
-    
     var posts = (existing_index.posts || []).
       filter(function (val) {
         return !new_posts_paths[val.json];
@@ -74,7 +72,7 @@ var genAll = function () {
     for (var tag in changed_tags) {
       if (tags.hasOwnProperty(tag)) {
         fs.writeFile(
-          tmpdir + '/' + makeblog.tagFileNameBase(tag) + '.json',
+          tmpdir + '/' + makeblog.tagFileNameBase(tag) + '.index.json',
           JSON.stringify(makeblog.indexStruct('Tag: ' + tag, tags[tag], all_tags)),
           throwErr
         );

@@ -10,7 +10,7 @@ export MAKEBLOG_PATH = $(dir $(lastword $(MAKEFILE_LIST)))
 # This is main index file that lists all posts. Only markdown files
 # that have 'date' header set are considered posts. Others are
 # considered static pages.
-export INDEX = tmp/index.json
+export INDEX = tmp/index.index.json
 
 # All markdown files will be parsed to json files in tmp dir and
 # indexed. JSONS variable is not exported because nested make
@@ -19,20 +19,32 @@ export INDEX = tmp/index.json
 export MARKDOWNS = $(wildcard src/*.md)
 JSONS = $(patsubst src/%.md,tmp/%.json,$(MARKDOWNS))
 
-.PHONY: blog clean apply_mustache
+LAYOUTS = $(filter-out %~,$(wildcard layouts/*))
+# Phony targets for applying mustache with all layouts and for
+# deleting generated output file.
+LAYOUTS_PHONY = $(patsubst %,%-grow-mustache,$(LAYOUTS))
+LAYOUTS_CLEAN = $(patsubst %,%-shave,$(LAYOUTS))
+
+.PHONY: blog clean mustaches clean-mustaches $(LAYOUTS_PHONY) $(LAYOUTS_CLEAN)
 
 # Main target.
-blog : tmp $(JSONS) $(INDEX) apply_mustache
+blog : tmp $(JSONS) $(INDEX) mustaches
 
-# Invokes makefile for applying mustache templates.
-apply_mustache: $(INDEX)
-	$(MAKE) -f $(MAKEBLOG_PATH)/apply_mustache.mk
+mustaches: $(LAYOUTS_PHONY)
+
+clean-mustaches: $(LAYOUTS_CLEAN)
+
+$(LAYOUTS_PHONY) : %-grow-mustache : % $(INDEX)
+	$(MAKE) -f $(MAKEBLOG_PATH)/apply_mustache.mk LAYOUT=$<
+
+$(LAYOUTS_CLEAN) : %-shave : % 
+	$(MAKE) -f $(MAKEBLOG_PATH)/apply_mustache.mk LAYOUT=$< clean
+
 
 # First invokes clean for apply_mustache.mk file, so all files that
 # are not known here but generated there are properly deleted. It's a
 # good practice to clean project in reverse order that it was built.
-clean:
-	$(MAKE) -f $(MAKEBLOG_PATH)/apply_mustache.mk clean
+clean: clean-mustaches
 	rm -rf tmp
 
 # Recreate tmp dir if needed.
