@@ -44,7 +44,7 @@ tmp:
 # file. It's needed only to set metadata in json file. No html file is
 # generated at this stage.
 tmp/%.json : src/%.md
-	node $(MAKEBLOG_PATH)/markdown_to_html.js $< $@ $(patsubst tmp/%.post.json,%.html,$@)
+	node $(MAKEBLOG_PATH)/markdown_to_html.js $< $@ $(patsubst tmp/%.post.json,%,$@)
 
 # Rule for generating index. Side effect of this is that for every tag
 # (defined in 'tag' header in each markdown file) a file named

@@ -6,7 +6,11 @@ exports.tagFileNameBase = function(tag) {
 
 exports.tagDescription = function (tag, count) {
   var filename = exports.tagFileNameBase(tag);
-  return { name: tag, html: filename + '.html', xml: filename + '.xml', count: count};
+  return {
+    name: tag,
+    basename: filename,
+    count: count
+  };
 };
 
 exports.indexStruct = function (title, posts, all_tags) {

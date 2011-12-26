@@ -13,7 +13,7 @@ Features:
 
 # Flow
 
-Here how it works:
+Here is how it works:
 
 1. `src/*.md` files are parsed to `tmp/*.json` files (HTML with some metadata).
 2. `tmp/*.index.json` files are generated for main list and each tag.
@@ -21,8 +21,7 @@ Here how it works:
 
 Illustrated:
 
-    /
-    |   == SOURCE PART BEGINS ==
+    /   == SOURCE PART BEGINS ==
     |
     +-- layouts/
     |   +-- post.html          Example layout for post. You can add as many
@@ -66,8 +65,48 @@ Illustrated:
 4. Put some input files in src directory.
 5. Run `make` inside your site's directory.
 
-# Data Available In Regular Files
+# Input Files Format
 
-# Data Available In Indexes
+    title: Title
+    date: 2012-01-01
+    tags: [a,b,c]
+    + any metadata you'd like (all in YAML format)
 
-# COPYING & Diclaimer
+    &&&
+
+    Abstract, introduction, etc (Markdown format)
+
+    &&&
+
+    Main article body (Markdown)
+
+# Data Available In Regular Layouts
+
+- **title**
+- **intro** - introduction part
+- **body**
+- **date**
+  - **str** - YYYY-MM-DD
+  - **day**, **month**, **year**
+  - **day0**, **month0**, **year0** - padded with zeros
+- **tags** - tags from header, each one has:
+  - **name** - tag name
+  - **basename** - basename of file (without extension)
+- **basename** - basename of output file (without extension and layout name)
+- **json** - path to json half-baked file
+- **markdown** - path to original markdown file
+- + everything you put in YAML header
+
+# Data Available In Indexes Layouts
+
+- **title** - name of or undefined for main index
+- **date** - date of freshest post for this index
+- **posts** - collection of posts with structure as in earlier list, sorted by date, descending
+- **all_tags** - list of tags sorted by item count in descending order, each one has:
+  - **name** - tag name
+  - **basename** - basename of file (whithout extension)
+  - **count** - number of posts tagged by this tag
+
+# COPYING & Disclaimer
+
+Copywrong 2010-2012 Szymon Witaborski, MIT License.
