@@ -109,4 +109,4 @@ Illustrated:
 
 # COPYING & Disclaimer
 
-Copywrong 2010-2012 Szymon Witaborski, MIT License.
+Copywrong 2010-2012 Szymon Witamborski, MIT License.
